@@ -31,7 +31,7 @@ This Project uses external dependencies and SDK's
 
 
 ## Authors
-* **Paramesh Bogala** 
+* **Paramesh Bogala** - [paramesh](https://github.com/paramesh514)
 
 ## Original Authors
 Forked from Credit Card Expense Manger
@@ -39,5 +39,5 @@ Forked from Credit Card Expense Manger
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/abicelis/ElectronicLoad/blob/master/LICENSE) file for details
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/paramesh514/ExpenseManager/blob/master/LICENSE) file for details
 
