@@ -47,21 +47,12 @@ public class AboutFragment extends Fragment {
         TextView version = (TextView) rootView.findViewById(R.id.fragment_about_version);
         TextView author = (TextView) rootView.findViewById(R.id.fragment_about_author);
         TextView websiteLink = (TextView) rootView.findViewById(R.id.fragment_about_website_link);
-        TextView marketLink = (TextView) rootView.findViewById(R.id.fragment_about_market_link);
         TextView githubLink = (TextView) rootView.findViewById(R.id.fragment_about_github_link);
 
 
         version.setText(String.format(Locale.getDefault(), getResources().getString(R.string.fragment_about_version), getAppVersionAndBuild(getActivity()).first));
         author.setText(String.format(Locale.getDefault(), getResources().getString(R.string.fragment_about_author), Calendar.getInstance().get(Calendar.YEAR)));
 
-        marketLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent playStoreIntent = new Intent(Intent.ACTION_VIEW);
-                playStoreIntent.setData(Uri.parse(getResources().getString(R.string.url_market)));
-                startActivity(playStoreIntent);
-            }
-        });
         githubLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

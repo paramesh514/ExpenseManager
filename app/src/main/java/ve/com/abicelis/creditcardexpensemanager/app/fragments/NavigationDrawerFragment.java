@@ -41,15 +41,15 @@ import ve.com.abicelis.creditcardexpensemanager.model.NavigationDrawerItem;
 public class NavigationDrawerFragment extends Fragment {
 
     //DATA
-    int mActiveCreditCardID = -1;
-    private CreditCard mActiveCreditCard = null;
+    //int mActiveCreditCardID = -1;
+    //private CreditCard mActiveCreditCard = null;
     private ExpenseManagerDAO mDao;
 
     //UI
-    SelectableCreditCardViewHolder holder;
+    //SelectableCreditCardViewHolder holder;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
-    private RelativeLayout mHeaderContainer;
+    //private RelativeLayout mHeaderContainer;
 
 
     @Nullable
@@ -69,56 +69,56 @@ public class NavigationDrawerFragment extends Fragment {
         if(mDao == null)
             mDao = new ExpenseManagerDAO(getActivity().getApplicationContext());
 
-        try {
-            mActiveCreditCardID = SharedPreferencesUtils.getInt(getContext(), Constants.ACTIVE_CC_ID);
-            mActiveCreditCard = mDao.getCreditCard(mActiveCreditCardID);
-        }catch (SharedPreferenceNotFoundException | CreditCardNotFoundException e) {}
+        //try {
+        //    mActiveCreditCardID = SharedPreferencesUtils.getInt(getContext(), Constants.ACTIVE_CC_ID);
+        //    mActiveCreditCard = mDao.getCreditCard(mActiveCreditCardID);
+        //}catch (SharedPreferenceNotFoundException | CreditCardNotFoundException e) {}
     }
 
 
     private void refreshDrawerHeader(View rootView) {
 
-        mHeaderContainer = (RelativeLayout) rootView.findViewById(R.id.nav_drawer_header_container);
-        View headerCreditCardContainer = rootView.findViewById(R.id.list_item_credit_card_container);
-        View errNoCC = rootView.findViewById(R.id.nav_drawer_err_no_cc);
-        View errSelectACC = rootView.findViewById(R.id.nav_drawer_err_select_a_cc);
+        //mHeaderContainer = (RelativeLayout) rootView.findViewById(R.id.nav_drawer_header_container);
+        //View headerCreditCardContainer = rootView.findViewById(R.id.list_item_credit_card_container);
+        //View errNoCC = rootView.findViewById(R.id.nav_drawer_err_no_cc);
+        //View errSelectACC = rootView.findViewById(R.id.nav_drawer_err_select_a_cc);
 
         //Hide all
-        headerCreditCardContainer.setVisibility(View.GONE);
-        errNoCC.setVisibility(View.GONE);
-        errSelectACC.setVisibility(View.GONE);
+        //headerCreditCardContainer.setVisibility(View.GONE);
+        //errNoCC.setVisibility(View.GONE);
+        //errSelectACC.setVisibility(View.GONE);
 
 
-        if(mActiveCreditCard != null) {                                                                             //There is an active credit card
+       // if(mActiveCreditCard != null) {                                                                             //There is an active credit card
             //Setup cc holder data
-            headerCreditCardContainer.setVisibility(View.VISIBLE);
-            holder = new SelectableCreditCardViewHolder(headerCreditCardContainer);
-            holder.setData(getContext(), mActiveCreditCard, 0);
-        } else if (mDao.getCreditCardList().size() > 0) {                                                           //There's no active cc but there are cc's in the db
-            errSelectACC.setVisibility(View.VISIBLE);
+          //  headerCreditCardContainer.setVisibility(View.VISIBLE);
+           // holder = new SelectableCreditCardViewHolder(headerCreditCardContainer);
+            //holder.setData(getContext(), mActiveCreditCard, 0);
+        //} else if (mDao.getCreditCardList().size() > 0) {                                                           //There's no active cc but there are cc's in the db
+          //  errSelectACC.setVisibility(View.VISIBLE);
             //Toast.makeText(getContext(), "Click to select a credit card", Toast.LENGTH_SHORT).show();
-        } else {                                                                                                    //No active and no cc's in db
-            errNoCC.setVisibility(View.VISIBLE);
+        //} else {                                                                                                    //No active and no cc's in db
+            //errNoCC.setVisibility(View.VISIBLE);
 
 
             //Set header onClick
-            mHeaderContainer.setOnClickListener(new View.OnClickListener() {
+      /*      mHeaderContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent addCCIntent = new Intent(getActivity(), AddCreditCardActivity.class);
                     //addCCIntent.putExtra(AddCreditCardActivity.CAME_FROM_WELCOME_ACTIVITY_INTENT, true);
                     startActivity(addCCIntent);
                 }
-            });
+            });*/
 
             //Toast.makeText(getContext(), "No credit cards, add a credit card", Toast.LENGTH_SHORT).show();
-        }
+        //}
 
-        if(mDao.getCreditCardList().size() > 0) {                                                   //If there's more than one cc, allow selection
+        //if(mDao.getCreditCardList().size() > 0) {                                                   //If there's more than one cc, allow selection
 
             //Set header onClick
-            mHeaderContainer = (RelativeLayout) rootView.findViewById(R.id.nav_drawer_header_container);
-            mHeaderContainer.setOnClickListener(new View.OnClickListener() {
+            //mHeaderContainer = (RelativeLayout) rootView.findViewById(R.id.nav_drawer_header_container);
+            /*mHeaderContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     SelectCreditCardDialogFragment dialog = SelectCreditCardDialogFragment.newInstance(mDao.getCreditCardList());
@@ -132,9 +132,9 @@ public class NavigationDrawerFragment extends Fragment {
                     });
                     dialog.show(getFragmentManager(), "fragment_dialog_select_credit_card");
                 }
-            });
+            });*/
 
-        }
+        //}
 
     }
 

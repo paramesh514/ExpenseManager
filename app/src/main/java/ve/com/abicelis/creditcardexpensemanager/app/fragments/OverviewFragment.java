@@ -53,12 +53,11 @@ public class OverviewFragment extends Fragment {
 
     //UI
     SelectableCreditCardViewHolder holder;
-    View headerCreditCardContainer;
-    HorizontalBar creditDatePeriodBar;
+   // View headerCreditCardContainer;
+    //HorizontalBar creditDatePeriodBar;
     HorizontalBar creditBalanceBar;
-    TextView extraInfo;
+    //TextView extraInfo;
     ScrollView scrollViewContainer;
-    View errNoCC;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -91,12 +90,11 @@ public class OverviewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_overview, container, false);
 
-        headerCreditCardContainer = view.findViewById(R.id.list_item_credit_card_container);
-        creditDatePeriodBar = (HorizontalBar) view.findViewById(R.id.frag_overview_credit_date_period_bar);
+        //headerCreditCardContainer = view.findViewById(R.id.list_item_credit_card_container);
+      //  creditDatePeriodBar = (HorizontalBar) view.findViewById(R.id.frag_overview_credit_date_period_bar);
         creditBalanceBar = (HorizontalBar) view.findViewById(R.id.frag_overview_credit_balance_bar);
-        extraInfo = (TextView) view.findViewById(R.id.frag_overview_extra_info);
+        //extraInfo = (TextView) view.findViewById(R.id.frag_overview_extra_info);
         scrollViewContainer = (ScrollView) view.findViewById(R.id.frag_overview_body_scroll_view_container);
-        errNoCC = view.findViewById(R.id.frag_overview_err_no_cc);
 
         refreshUI();
 
@@ -114,14 +112,13 @@ public class OverviewFragment extends Fragment {
 
         //Hide all
         scrollViewContainer.setVisibility(View.GONE);
-        headerCreditCardContainer.setVisibility(View.GONE);
-        errNoCC.setVisibility(View.GONE);
+     //   headerCreditCardContainer.setVisibility(View.GONE);
 
         if (activeCreditCard != null) {
             try {
 
                 scrollViewContainer.setVisibility(View.VISIBLE);
-                headerCreditCardContainer.setVisibility(View.VISIBLE);
+       //         headerCreditCardContainer.setVisibility(View.VISIBLE);
 
                 /* DatePeriod bar */
                 Calendar today = Calendar.getInstance();
@@ -135,12 +132,6 @@ public class OverviewFragment extends Fragment {
                 else
                     datePeriodPercentage = 0;
 
-                creditDatePeriodBar.setProgressPercentage(datePeriodPercentage);
-                creditDatePeriodBar.setTextLo(DateUtils.getDayShortMonthString(startDate));
-                creditDatePeriodBar.setTextHi(DateUtils.getDayShortMonthString(endDate));
-                if(today.getTimeInMillis() <= endDate.getTimeInMillis()) {   //If today falls in viewed creditperiod, show the date.
-                    creditDatePeriodBar.setTextBar(DateUtils.getDayShortMonthString(today));
-                }
 
                 /* Balance bar */
                 int creditLimit = activeCreditCard.getCreditPeriods().get(0).getCreditLimit().toBigInteger().intValue();
@@ -159,10 +150,10 @@ public class OverviewFragment extends Fragment {
                 creditBalanceBar.setTextLo("0 " + currencyCode);
 
 
-                extraInfo.setText(TextUtils.fromHtml(generateExtraInfo()));
+          ///      extraInfo.setText(TextUtils.fromHtml(generateExtraInfo()));
 
                 //Setup cc data
-                holder = new SelectableCreditCardViewHolder(headerCreditCardContainer);
+         //       holder = new SelectableCreditCardViewHolder(headerCreditCardContainer);
                 holder.setData(getContext(), activeCreditCard, 0);
             }catch (Exception e) {
                 Toast.makeText(getActivity(), "Problem refreshing card data", Toast.LENGTH_SHORT).show();
@@ -171,7 +162,7 @@ public class OverviewFragment extends Fragment {
             }
 
         } else {
-            errNoCC.setVisibility(View.VISIBLE);
+            //errNoCC.setVisibility(View.VISIBLE);
         }
     }
 
