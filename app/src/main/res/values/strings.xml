@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CC Manager</string>
+    <string name="app_name">Expense Manager</string>
 
     /*Generic errors*/
     <string name="err_no_credit_card_selected">No credit card selected</string>

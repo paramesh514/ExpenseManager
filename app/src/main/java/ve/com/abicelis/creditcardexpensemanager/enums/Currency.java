@@ -7,6 +7,7 @@ import java.io.Serializable;
  */
 public enum Currency implements Serializable {
 
+    INR("Indian Rupee"),
     USD("US Dollar"),
     CAD("Canadian Dollar"),
     VEF("Venezuelan Bolivar"),

@@ -7,8 +7,8 @@ import ve.com.abicelis.creditcardexpensemanager.R;
  */
 public enum ExpenseType {
 
-    ORDINARY("Ordinary", "ORD", R.color.expense_category_4),
-    EXTRAORDINARY("Extraordinary", "EXT", R.color.expense_category_7);
+    ORDINARY("Personal", "ORD", R.color.expense_category_4),
+    EXTRAORDINARY("Business", "EXT", R.color.expense_category_7);
 
 
 

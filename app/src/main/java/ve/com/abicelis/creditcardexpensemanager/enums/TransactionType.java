@@ -5,7 +5,9 @@ package ve.com.abicelis.creditcardexpensemanager.enums;
  */
 public enum TransactionType {
     EXPENSE("Expense"),
-    PAYMENT("Income");
+    PAYMENT("Income"),
+    TRANSFER("Transfer"),
+    CORRECTION("Correction");
 
     private String mFriendlyName;
 

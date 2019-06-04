@@ -25,7 +25,7 @@ public class LauncherActivity extends Activity {
 
         ExpenseManagerDAO mDao = new ExpenseManagerDAO(getApplicationContext());
 
-        //Check if ACTIVE_CC_ID exists and it is valid
+        /*Check if ACTIVE_CC_ID exists and it is valid
         try {
             int activeCreditCardId = SharedPreferencesUtils.getInt(getApplicationContext(), Constants.ACTIVE_CC_ID);
             mDao.getCreditCard(activeCreditCardId);
@@ -40,11 +40,7 @@ public class LauncherActivity extends Activity {
                 finish();
                 return;
             }
-        }
-
-
-
-
+        }*/
 
         //All is good, go home!
         startActivity(new Intent(this, HomeActivity.class));
