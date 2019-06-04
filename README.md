@@ -1,12 +1,9 @@
-# Credit Card Expense Manager #
+# Expense Manager #
 
 
 ## About the app
 
-Keep track of your credit card balance quickly and easily on your phone! This app is designed to record your credit card expenses using your camera!
-
-
-<a target="_blank" href='https://play.google.com/store/apps/details?id=ve.com.abicelis.creditcardexpensemanager&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' width="240px"/></a>
+Keep track of your credit card and account balance quickly and easily on your phone! This app is designed to record your expense based on SMS or manually.
 
 
 This app features:
@@ -14,7 +11,7 @@ This app features:
 - Simple Material design!
 - Add expenses manually
 - Add expenses using your camera!
-- Track multiple Credit Cards
+- Track multiple Accounts & Credit Cards
 
 
 ## Code dependencies
@@ -30,11 +27,14 @@ This Project uses external dependencies and SDK's
 
 ## Software used
 
-* [Android Studio 2.3 IDE](https://developer.android.com/studio/index.html) - IDE
+* [Android Studio 3.4 IDE](https://developer.android.com/studio/index.html) - IDE
 
 
 ## Authors
+* **Paramesh Bogala** 
 
+## Original Authors
+Forked from Credit Card Expense Manger
 * **Alejandro Bicelis** - *Coding* - [abicelis](https://github.com/abicelis)
 
 ## License
