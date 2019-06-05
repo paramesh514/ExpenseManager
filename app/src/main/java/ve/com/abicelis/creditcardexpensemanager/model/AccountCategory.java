@@ -1,25 +1,34 @@
-package ve.com.abicelis.creditcardexpensemanager.enums;
-
-import java.util.ArrayList;
-import java.util.List;
+package ve.com.abicelis.creditcardexpensemanager.model;
 
 import ve.com.abicelis.creditcardexpensemanager.R;
 
 /**
  * Created by Alex on 6/8/2016.
  */
-public class TransactionCategory {
+public enum AccountCategory {
+
+    FOOD(0, "Food", R.color.expense_category_1),
+    LEISURE(1, "Leisure", R.color.expense_category_2),
+    ENTERTAINMENT(2, "Entertainment", R.color.expense_category_3),
+    CLOTHING(3, "Clothing", R.color.expense_category_4),
+    EDUCATION(4, "Education", R.color.expense_category_5);
+
+
 
     private int mIndex;
     private String mFriendlyName;
-    private TransactionType type;
     private int mColor;
 
-    TransactionCategory(int index, String friendlyName, int color) {
+    AccountCategory(int index, String friendlyName, int color) {
 
         mIndex = index;
         mFriendlyName = friendlyName;
         mColor = color;
+    }
+
+
+    public String getCode(){
+        return this.name();
     }
 
     public int getColor() {
@@ -39,9 +48,9 @@ public class TransactionCategory {
        return mIndex;
     }
 
-    public static TransactionCategory getByExpenseCategoryId(int expenseCategoryId) {
-        List<TransactionCategory> allCatagories= new ArrayList<TransactionCategory>();
-        for(TransactionCategory expenseCategory : allCatagories) {
+    public static AccountCategory getByExpenseCategoryId(int expenseCategoryId) {
+
+        for(AccountCategory expenseCategory : AccountCategory.values()) {
             if(expenseCategory.getIndex() == expenseCategoryId)
                 return expenseCategory;
         }
