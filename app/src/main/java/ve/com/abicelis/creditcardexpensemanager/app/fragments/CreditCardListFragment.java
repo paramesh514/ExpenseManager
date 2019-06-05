@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ve.com.abicelis.creditcardexpensemanager.R;
-import ve.com.abicelis.creditcardexpensemanager.app.activities.AddCreditCardActivity;
+import ve.com.abicelis.creditcardexpensemanager.app.activities.AddAccountActivity;
 import ve.com.abicelis.creditcardexpensemanager.app.adapters.CreditCardAdapter;
 import ve.com.abicelis.creditcardexpensemanager.app.dialogs.EditOrDeleteCreditCardDialogFragment;
 import ve.com.abicelis.creditcardexpensemanager.app.holders.CreditCardViewHolder;
@@ -122,7 +122,7 @@ public class CreditCardListFragment extends Fragment {
         fabNewCreditCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent addCCIntent = new Intent(getActivity(), AddCreditCardActivity.class);
+                Intent addCCIntent = new Intent(getActivity(), AddAccountActivity.class);
                 startActivity(addCCIntent);
             }
         });
