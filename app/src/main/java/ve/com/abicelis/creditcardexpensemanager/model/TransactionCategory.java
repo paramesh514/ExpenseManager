@@ -14,6 +14,7 @@ public class TransactionCategory {
     private String mFriendlyName;
     private TransactionType type;
     private int mColor;
+    private float budget;
 
     TransactionCategory(int index, String friendlyName, int color) {
 

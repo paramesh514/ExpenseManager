@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import ve.com.abicelis.creditcardexpensemanager.R;
+import ve.com.abicelis.creditcardexpensemanager.enums.AccountType;
 import ve.com.abicelis.creditcardexpensemanager.enums.CreditCardBackground;
 import ve.com.abicelis.creditcardexpensemanager.enums.CreditCardType;
 import ve.com.abicelis.creditcardexpensemanager.enums.Currency;
@@ -25,40 +26,43 @@ public class Account implements Serializable {
     private String nickName;
     private String bankName;
     private String accNumber;
+    private float balance;
     private Currency currency;
-    private CreditCardType cardType;
-    private Calendar cardExpiration;
-    private int closingDay;         // Fecha de corte: Fecha de cierre de operaciones del mes, para efectos de registros y cobros.
-    private int dueDay;             // Fecha Limite de Pago: Fecha máxima para el próximo pago sin generar incumplimiento e intereses de mora.
-    private CreditCardBackground creditCardBackground;
+    private AccountType accountType;
+    private Calendar balanceUpdated;
+    private boolean isActive;
+    private List<Account> linkedCards;
+    //private int closingDay;         // Fecha de corte: Fecha de cierre de operaciones del mes, para efectos de registros y cobros.
+    //private int dueDay;             // Fecha Limite de Pago: Fecha máxima para el próximo pago sin generar incumplimiento e intereses de mora.
+    //private CreditCardBackground creditCardBackground;
 
 
-    private Map<Integer, CreditPeriod> creditPeriods;
+   // private Map<Integer, CreditPeriod> creditPeriods;
 
-    public Account(String nickName, String bankName, String accNumber, @NonNull Currency currency, @NonNull CreditCardType cardType, @NonNull Calendar cardExpiration, int closingDay, int dueDay, @NonNull CreditCardBackground creditCardBackground) {
+    public Account(String nickName, String bankName, String accNumber, @NonNull Currency currency, @NonNull AccountType accountType, @NonNull Calendar balanceUpdated) {
         this.nickName = nickName;
         this.bankName = bankName;
         this.accNumber = accNumber;
         this.currency = currency;
-        this.cardType = cardType;
+        this.accountType = accountType;
 
-        this.cardExpiration = Calendar.getInstance();
-        this.cardExpiration.setTimeZone(cardExpiration.getTimeZone());
-        this.cardExpiration.setTimeInMillis(cardExpiration.getTimeInMillis());
+        this.balanceUpdated = Calendar.getInstance();
+        this.balanceUpdated.setTimeZone(balanceUpdated.getTimeZone());
+        this.balanceUpdated.setTimeInMillis(balanceUpdated.getTimeInMillis());
 
-        this.dueDay = dueDay;
-        this.closingDay = closingDay;
-        this.creditCardBackground = creditCardBackground;
+     //   this.dueDay = dueDay;
+       // this.closingDay = closingDay;
+        //this.creditCardBackground = creditCardBackground;
     }
 
-    public Account(int id, String nickName, String bankName, String accNumber, @NonNull Currency currency, @NonNull CreditCardType cardType, @NonNull Calendar cardExpiration, int closingDay, int dueDay, @NonNull CreditCardBackground creditCardBackground) {
-        this(nickName, bankName, accNumber, currency, cardType, cardExpiration, closingDay, dueDay, creditCardBackground);
+    public Account(int id, String nickName, String bankName, String accNumber, @NonNull Currency currency, @NonNull AccountType accountType, @NonNull Calendar balanceUpdated) {
+        this(nickName, bankName, accNumber, currency, accountType, balanceUpdated);
         this.id = id;
     }
 
-    public Account(int id, String nickName, String bankName, String accNumber, @NonNull Currency currency, @NonNull CreditCardType cardType, @NonNull Calendar cardExpiration, int closingDay, int dueDay, @NonNull CreditCardBackground creditCardBackground, @NonNull Map<Integer, CreditPeriod> creditPeriods) {
-        this(id, nickName, bankName, accNumber, currency, cardType, cardExpiration, closingDay, dueDay, creditCardBackground);
-        this.creditPeriods = creditPeriods;
+    public Account(int id, String nickName, String bankName, String accNumber, @NonNull Currency currency, @NonNull AccountType accountType, @NonNull Calendar balanceUpdated, List<Account> linkedAccounts) {
+        this(id, nickName, bankName, accNumber, currency, accountType, balanceUpdated);
+        this.linkedCards = linkedAccounts;
     }
 
 
@@ -100,86 +104,22 @@ public class Account implements Serializable {
         this.currency = currency;
     }
 
-    public CreditCardType getCardType() {
-        return cardType;
+    public AccountType getAccountType() {
+        return accountType;
     }
 
-    public void setCardType(CreditCardType cardType) {
-        this.cardType = cardType;
+    public void setAccountType(AccountType accountType) {
+        this.accountType = accountType;
     }
 
-    public Calendar getCardExpiration() {
-        return cardExpiration;
+    public Calendar getBalanceUpdated() {
+        return balanceUpdated;
     }
 
-    public void setCardExpiration(Calendar cardExpiration) {
-        this.cardExpiration = Calendar.getInstance();
-        this.cardExpiration.setTimeZone(cardExpiration.getTimeZone());
-        this.cardExpiration.setTimeInMillis(cardExpiration.getTimeInMillis());
-    }
-
-    public String getShortCardExpirationString() {
-        if(cardExpiration == null)
-            return "-/-";
-
-        SimpleDateFormat formatter = new SimpleDateFormat("MM/yy", Locale.getDefault());
-        return formatter.format(cardExpiration.getTime());
-    }
-
-    public String getLongCardExpirationString() {
-        if(cardExpiration == null)
-            return "-";
-
-        SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
-        return formatter.format(cardExpiration.getTime());
-    }
-
-    public int getClosingDay() {
-        return closingDay;
-    }
-
-    public void setClosingDay(int closingDay) {
-        this.closingDay = closingDay;
-    }
-
-    public int getDueDay() {
-        return dueDay;
-    }
-
-    public void setDueDay(int dueDay) {
-        this.dueDay = dueDay;
-    }
-
-    public CreditCardBackground getCreditCardBackground() {
-        return creditCardBackground;
-    }
-
-    public Map<Integer, CreditPeriod> getCreditPeriods() {
-        return creditPeriods;
-    }
-
-    public void setCreditPeriods(Map<Integer, CreditPeriod> creditPeriods) {
-        this.creditPeriods = creditPeriods;
-    }
-
-    /**
-     * Returns a List of Credit Cards based on the number of existing CreditCardBackgrounds, instantiated with default values
-     * @return List<CreditCard>
-     */
-    public static List<Account> getCreditCardBackgroundTypesList(Context context) {
-        List<Account> creditCards = new ArrayList<>();
-
-        String defaultAlias = context.getResources().getString(R.string.activity_add_new_cc_alias);
-        String defaultBankName = context.getResources().getString(R.string.activity_add_new_cc_bank);
-        String defaultCardNumber = context.getResources().getString(R.string.activity_add_new_cc_number);
-        Calendar defaultExpiration = Calendar.getInstance();
-        defaultExpiration.add(Calendar.YEAR, 5);
-
-        for (CreditCardBackground c : CreditCardBackground.values()) {
-            creditCards.add(new Account(defaultAlias, defaultBankName, defaultCardNumber, Currency.USD, CreditCardType.AMEX, defaultExpiration, 0, 0, c));
-        }
-
-        return creditCards;
+    public void setBalanceUpdated(Calendar balanceUpdated) {
+        this.balanceUpdated = Calendar.getInstance();
+        this.balanceUpdated.setTimeZone(balanceUpdated.getTimeZone());
+        this.balanceUpdated.setTimeInMillis(balanceUpdated.getTimeInMillis());
     }
 
     @Override
@@ -188,10 +128,10 @@ public class Account implements Serializable {
                 " nickName=" + nickName + "\r\n" +
                 " accNumber=" + accNumber + "\r\n" +
                 " currency=" + currency + "\r\n" +
-                " cardType=" + cardType + "\r\n" +
-                " cardExpiration=" + cardExpiration + "\r\n" +
-                " closingDay=" + closingDay + "\r\n" +
-                " dueDay=" + dueDay + "\r\n" +
-                " creditPeriods=" + creditPeriods;
+                " accountType=" + accountType + "\r\n" +
+                " balance="+balance+"\r\n"+
+                " balanceUpdated=" + balanceUpdated + "\r\n" +
+                " isAcitve="+isActive+"\r\n"+
+                " creditPeriods=" + linkedCards;
     }
 }

@@ -13,6 +13,7 @@ import java.util.Calendar;
 import ve.com.abicelis.creditcardexpensemanager.enums.Currency;
 import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseCategory;
 import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseType;
+import ve.com.abicelis.creditcardexpensemanager.enums.TransactionType;
 
 /**
  * Created by Alex on 6/8/2016.
@@ -26,11 +27,13 @@ public class Transaction implements Serializable {
     BigDecimal amount;
     Currency currency;
     Calendar date;
-    ExpenseCategory expenseCategory;
-    ExpenseType expenseType;
+    TransactionCategory expenseCategory;
+    TransactionType expenseType;
+    Account Giver;
+    Account taker;
 
 
-    public Transaction(@NonNull String description, @Nullable byte[] thumbnail, @Nullable String fullImagePath, @NonNull BigDecimal amount, @NonNull Currency currency, @NonNull Calendar date, @NonNull ExpenseCategory expenseCategory, @NonNull ExpenseType expenseType) {
+    public Transaction(@NonNull String description, @Nullable byte[] thumbnail, @Nullable String fullImagePath, @NonNull BigDecimal amount, @NonNull Currency currency, @NonNull Calendar date, @NonNull TransactionCategory TransactionCategory, @NonNull TransactionType expenseType) {
         this.description = description;
         this.fullImagePath = fullImagePath;
         this.amount = amount;
@@ -47,7 +50,7 @@ public class Transaction implements Serializable {
         this.date.setTimeInMillis(date.getTimeInMillis());
     }
 
-    public Transaction(int id, String description, byte[] thumbnail, String fullImagePath, BigDecimal amount, Currency currency, Calendar date, ExpenseCategory expenseCategory, ExpenseType expenseType) {
+    public Transaction(int id, String description, byte[] thumbnail, String fullImagePath, BigDecimal amount, Currency currency, Calendar date, TransactionCategory expenseCategory, TransactionType expenseType) {
         this(description, thumbnail, fullImagePath, amount, currency, date, expenseCategory, expenseType);
         this.id = id;
     }
@@ -90,11 +93,11 @@ public class Transaction implements Serializable {
     }
 
 
-    public ExpenseCategory getExpenseCategory() {
+    public TransactionCategory getExpenseCategory() {
         return expenseCategory;
     }
 
-    public ExpenseType getExpenseType() {
+    public TransactionType getExpenseType() {
         return expenseType;
     }
 

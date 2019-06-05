@@ -9,7 +9,8 @@ public enum AccountType {
     Wallet("Wallet"),
     CreditCard("CreditCard"),
     Loan("Loan"),
-    Investment("Investment");
+    Investment("Investment"),
+    Merchant("Merchant");
 
     private String mFriendlyName;
 
