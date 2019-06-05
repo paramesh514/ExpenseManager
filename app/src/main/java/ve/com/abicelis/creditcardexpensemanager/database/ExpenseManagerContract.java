@@ -64,4 +64,47 @@ public final class ExpenseManagerContract {
 
     }
 
+    /* CreditCard Table */
+    public static abstract class AccountTable implements BaseColumns {
+        public static final String TABLE_NAME = "myaccounts";
+        //public static final TableColumn COLUMN_NAME_NICK_NAME = new TableColumn(DataType.TEXT, "nickname");
+        public static final TableColumn COLUMN_NAME_NICK_NAME = new TableColumn(DataType.TEXT, "nickname");
+        public static final TableColumn COLUMN_NAME_BANK_NAME = new TableColumn(DataType.TEXT, "bankname");
+        public static final TableColumn COLUMN_NAME_ACCOUNT_NUMBER = new TableColumn(DataType.TEXT, "accnumber");
+        public static final TableColumn COLUMN_NAME_CURRENCY = new TableColumn(DataType.TEXT, "currency");
+        public static final TableColumn COLUMN_NAME_ACCOUNT_TYPE = new TableColumn(DataType.TEXT, "accounttype");
+        public static final TableColumn COLUMN_NAME_BALANCE = new TableColumn(DataType.REAL, "balance");
+        public static final TableColumn COLUMN_NAME_BALANCE_UPDATE = new TableColumn(DataType.TEXT, "balanceupdate");
+
+        //public static final TableColumn COLUMN_NAME_CLOSING_DAY = new TableColumn(DataType.TEXT, "closingday");
+        //public static final TableColumn COLUMN_NAME_DUE_DAY = new TableColumn(DataType.TEXT, "dueday");
+        //public static final TableColumn COLUMN_NAME_BACKGROUND = new TableColumn(DataType.TEXT, "background");
+    }
+
+    /* CreditCard Table */
+    public static abstract class TransactionTable implements BaseColumns {
+        public static final String TABLE_NAME = "mytransactions";
+
+        public static final TableColumn COLUMN_NAME_FOREIGN_KEY_GIVER = new TableColumn(DataType.INTEGER, "fk_giver");
+        public static final TableColumn COLUMN_NAME_FOREIGN_KEY_RECIEVER = new TableColumn(DataType.INTEGER, "fk_reciever");
+        public static final TableColumn COLUMN_NAME_DESCRIPTION = new TableColumn(DataType.TEXT, "description");
+        public static final TableColumn COLUMN_NAME_THUMBNAIL = new TableColumn(DataType.BLOB, "thumbnail");
+        public static final TableColumn COLUMN_NAME_FULL_IMAGE_PATH = new TableColumn(DataType.TEXT, "fullimagepath");
+        public static final TableColumn COLUMN_NAME_AMOUNT = new TableColumn(DataType.REAL, "amount");
+        public static final TableColumn COLUMN_NAME_CURRENCY = new TableColumn(DataType.TEXT, "currency");
+        public static final TableColumn COLUMN_NAME_DATE = new TableColumn(DataType.INTEGER, "date");
+        public static final TableColumn COLUMN_NAME_TRANSACTION_CATEGORY = new TableColumn(DataType.TEXT, "transactioncategory");
+        public static final TableColumn COLUMN_NAME_TRANSACTION_TYPE = new TableColumn(DataType.TEXT, "transactiontype");
+
+    }
+
+    /* CreditCard Table */
+    public static abstract class TransactionCategoryTable implements BaseColumns {
+        public static final String TABLE_NAME = "transactionCategory";
+        public static final TableColumn COLUMN_NAME_DESCRIPTION = new TableColumn(DataType.TEXT, "description");
+        public static final TableColumn COLUMN_NAME_TRASACTION_TYPE = new TableColumn(DataType.TEXT, "transactiontype");
+        public static final TableColumn COLUMN_NAME_BUDGET = new TableColumn(DataType.REAL, "budget");
+    }
+
+
 }

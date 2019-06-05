@@ -40,13 +40,4 @@ public class TransactionCategory {
        return mIndex;
     }
 
-    public static TransactionCategory getByExpenseCategoryId(int expenseCategoryId) {
-        List<TransactionCategory> allCatagories= new ArrayList<TransactionCategory>();
-        for(TransactionCategory expenseCategory : allCatagories) {
-            if(expenseCategory.getIndex() == expenseCategoryId)
-                return expenseCategory;
-        }
-        throw new IllegalArgumentException(String.valueOf(expenseCategoryId));
-    }
-
 }

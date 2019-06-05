@@ -107,7 +107,7 @@ public class Expense implements Serializable {
                 " amount=" + amount + "\r\n" +
                 " currency=" + currency + "\r\n" +
                 " date=" + date + "\r\n" +
-                " expenseCategory=" + expenseCategory + "\r\n" +
-                " expenseType=" + expenseType;
+                " transactionCategory=" + expenseCategory + "\r\n" +
+                " transactionType=" + expenseType;
     }
 }

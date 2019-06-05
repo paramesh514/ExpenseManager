@@ -122,6 +122,30 @@ public class Account implements Serializable {
         this.balanceUpdated.setTimeInMillis(balanceUpdated.getTimeInMillis());
     }
 
+    public float getBalance() {
+        return balance;
+    }
+
+    public void setBalance(float balance) {
+        this.balance = balance;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public List<Account> getLinkedCards() {
+        return linkedCards;
+    }
+
+    public void setLinkedCards(List<Account> linkedCards) {
+        this.linkedCards = linkedCards;
+    }
+
     @Override
     public String toString() {
         return  "ID=" + id + "\r\n" +

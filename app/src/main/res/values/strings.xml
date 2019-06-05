@@ -13,7 +13,7 @@
     <string name="drawer_error_no_credit_cards">No credit cards.\n Tap here to add a new card.</string>
     <string name="drawer_error_select_a_credit_card">Tap to select a credit card.</string>
     <string name="fragment_name_overview">Overview</string>
-    <string name="fragment_name_expense_list">Expenses</string>
+    <string name="fragment_name_expense_list">Transactions</string>
     <string name="fragment_name_graphs">Expense Graphs</string>
     <string name="fragment_name_credit_cards">Accounts</string>
     <string name="fragment_name_about">About</string>

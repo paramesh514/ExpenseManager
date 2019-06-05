@@ -20,7 +20,7 @@ import ve.com.abicelis.creditcardexpensemanager.app.utils.FileUtils;
 public class ExpenseManagerDbHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "ExpenseManager.db";
-    public static final int DATABASE_VERSION = 2;                               // If you change the database schema, you must increment the database version.
+    public static final int DATABASE_VERSION = 3;                               // If you change the database schema, you must increment the database version.
     private static final String COMMA_SEP = ", ";
 
     private String mAppDbFilepath;
@@ -241,6 +241,55 @@ public class ExpenseManagerDbHelper extends SQLiteOpenHelper {
 
                 " ); ";
         sqLiteDatabase.execSQL(statement);
+
+        //Account Table
+        statement = "CREATE TABLE " + ExpenseManagerContract.AccountTable.TABLE_NAME + " (" +
+                ExpenseManagerContract.AccountTable._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                ExpenseManagerContract.AccountTable.COLUMN_NAME_NICK_NAME.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_NICK_NAME.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.AccountTable.COLUMN_NAME_BANK_NAME.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_BANK_NAME.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_NUMBER.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_NUMBER.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.AccountTable.COLUMN_NAME_CURRENCY.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_CURRENCY.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_TYPE.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_TYPE.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE_UPDATE.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE_UPDATE.getDataType() +
+                //ExpenseManagerContract.AccountTable.COLUMN_NAME_CLOSING_DAY.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_CLOSING_DAY.getDataType() + COMMA_SEP +
+                //ExpenseManagerContract.AccountTable.COLUMN_NAME_DUE_DAY.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_DUE_DAY.getDataType() + COMMA_SEP +
+                //ExpenseManagerContract.CreditCardTable.COLUMN_NAME_BACKGROUND.getName() + " " + ExpenseManagerContract.CreditCardTable.COLUMN_NAME_BACKGROUND.getDataType() +
+                " ); " ;
+        sqLiteDatabase.execSQL(statement);
+       //Transaction Table
+        statement = "CREATE TABLE " + ExpenseManagerContract.TransactionTable.TABLE_NAME + " (" +
+                ExpenseManagerContract.TransactionTable._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + COMMA_SEP +
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_FOREIGN_KEY_GIVER.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_FOREIGN_KEY_GIVER.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_FOREIGN_KEY_RECIEVER.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_FOREIGN_KEY_RECIEVER.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_DESCRIPTION.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_DESCRIPTION.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_THUMBNAIL.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_THUMBNAIL.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_FULL_IMAGE_PATH.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_FULL_IMAGE_PATH.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_AMOUNT.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_AMOUNT.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_CURRENCY.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_CURRENCY.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_DATE.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_DATE.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_CATEGORY.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_CATEGORY.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_TYPE.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_TYPE.getDataType() +
+
+                " ); ";
+        sqLiteDatabase.execSQL(statement);
+        //Transaction Category Table
+        statement = "CREATE TABLE " + ExpenseManagerContract.TransactionCategoryTable.TABLE_NAME + " (" +
+                ExpenseManagerContract.TransactionCategoryTable._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_DESCRIPTION.getName() + " " + ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_DESCRIPTION.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRASACTION_TYPE.getName() + " " + ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRASACTION_TYPE.getDataType() + COMMA_SEP +
+                ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_BUDGET.getName() + " " + ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_BUDGET.getDataType() +
+                //ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_NUMBER.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_NUMBER.getDataType() + COMMA_SEP +
+                //ExpenseManagerContract.AccountTable.COLUMN_NAME_CURRENCY.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_CURRENCY.getDataType() + COMMA_SEP +
+                //ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_TYPE.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_TYPE.getDataType() + COMMA_SEP +
+                //ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE.getDataType() + COMMA_SEP +
+                //ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE_UPDATE.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE_UPDATE.getDataType() + COMMA_SEP +
+                //ExpenseManagerContract.AccountTable.COLUMN_NAME_CLOSING_DAY.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_CLOSING_DAY.getDataType() + COMMA_SEP +
+                //ExpenseManagerContract.AccountTable.COLUMN_NAME_DUE_DAY.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_DUE_DAY.getDataType() + COMMA_SEP +
+                //ExpenseManagerContract.CreditCardTable.COLUMN_NAME_BACKGROUND.getName() + " " + ExpenseManagerContract.CreditCardTable.COLUMN_NAME_BACKGROUND.getDataType() +
+                " ); " ;
+        sqLiteDatabase.execSQL(statement);
+
     }
 
     private void deleteDatabase(SQLiteDatabase sqLiteDatabase) {
@@ -256,6 +305,15 @@ public class ExpenseManagerDbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(statement);
 
         statement = "DROP TABLE IF EXISTS " + ExpenseManagerContract.CreditCardTable.TABLE_NAME + "; ";
+        sqLiteDatabase.execSQL(statement);
+
+        statement = "DROP TABLE IF EXISTS " + ExpenseManagerContract.AccountTable.TABLE_NAME + "; ";
+        sqLiteDatabase.execSQL(statement);
+
+        statement = "DROP TABLE IF EXISTS " + ExpenseManagerContract.TransactionTable.TABLE_NAME + "; ";
+        sqLiteDatabase.execSQL(statement);
+
+        statement = "DROP TABLE IF EXISTS " + ExpenseManagerContract.TransactionCategoryTable.TABLE_NAME + "; ";
         sqLiteDatabase.execSQL(statement);
     }
 }

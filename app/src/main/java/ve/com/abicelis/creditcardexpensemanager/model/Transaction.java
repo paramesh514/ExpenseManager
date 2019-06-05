@@ -11,8 +11,6 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 
 import ve.com.abicelis.creditcardexpensemanager.enums.Currency;
-import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseCategory;
-import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseType;
 import ve.com.abicelis.creditcardexpensemanager.enums.TransactionType;
 
 /**
@@ -27,19 +25,19 @@ public class Transaction implements Serializable {
     BigDecimal amount;
     Currency currency;
     Calendar date;
-    TransactionCategory expenseCategory;
-    TransactionType expenseType;
+    TransactionCategory transactionCategory;
+    TransactionType transactionType;
     Account Giver;
     Account taker;
 
 
-    public Transaction(@NonNull String description, @Nullable byte[] thumbnail, @Nullable String fullImagePath, @NonNull BigDecimal amount, @NonNull Currency currency, @NonNull Calendar date, @NonNull TransactionCategory TransactionCategory, @NonNull TransactionType expenseType) {
+    public Transaction(@NonNull String description, @Nullable byte[] thumbnail, @Nullable String fullImagePath, @NonNull BigDecimal amount, @NonNull Currency currency, @NonNull Calendar date, @NonNull TransactionCategory TransactionCategory, @NonNull TransactionType transactionType) {
         this.description = description;
         this.fullImagePath = fullImagePath;
         this.amount = amount;
         this.currency = currency;
-        this.expenseCategory = expenseCategory;
-        this.expenseType = expenseType;
+        this.transactionCategory = transactionCategory;
+        this.transactionType = transactionType;
 
         this.thumbnail = thumbnail;
         if(this.thumbnail != null && this.thumbnail.equals(new byte[0]) )   //if thumbnail is empty byte array -> null
@@ -50,8 +48,8 @@ public class Transaction implements Serializable {
         this.date.setTimeInMillis(date.getTimeInMillis());
     }
 
-    public Transaction(int id, String description, byte[] thumbnail, String fullImagePath, BigDecimal amount, Currency currency, Calendar date, TransactionCategory expenseCategory, TransactionType expenseType) {
-        this(description, thumbnail, fullImagePath, amount, currency, date, expenseCategory, expenseType);
+    public Transaction(int id, String description, byte[] thumbnail, String fullImagePath, BigDecimal amount, Currency currency, Calendar date, TransactionCategory transactionCategory, TransactionType transactionType) {
+        this(description, thumbnail, fullImagePath, amount, currency, date, transactionCategory, transactionType);
         this.id = id;
     }
 
@@ -93,15 +91,61 @@ public class Transaction implements Serializable {
     }
 
 
-    public TransactionCategory getExpenseCategory() {
-        return expenseCategory;
+    public TransactionCategory getTransactionCategory() {
+        return transactionCategory;
     }
 
-    public TransactionType getExpenseType() {
-        return expenseType;
+    public TransactionType getTransactionType() {
+        return transactionType;
     }
 
+    public Account getGiver() {
+        return Giver;
+    }
 
+    public void setGiver(Account giver) {
+        Giver = giver;
+    }
+
+    public Account getTaker() {
+        return taker;
+    }
+
+    public void setTaker(Account taker) {
+        this.taker = taker;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setThumbnail(byte[] thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
+    public void setFullImagePath(String fullImagePath) {
+        this.fullImagePath = fullImagePath;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
+    public void setDate(Calendar date) {
+        this.date = date;
+    }
+
+    public void setTransactionCategory(TransactionCategory transactionCategory) {
+        this.transactionCategory = transactionCategory;
+    }
+
+    public void setTransactionType(TransactionType transactionType) {
+        this.transactionType = transactionType;
+    }
 
     @Override
     public String toString() {
@@ -110,7 +154,7 @@ public class Transaction implements Serializable {
                 " amount=" + amount + "\r\n" +
                 " currency=" + currency + "\r\n" +
                 " date=" + date + "\r\n" +
-                " expenseCategory=" + expenseCategory + "\r\n" +
-                " expenseType=" + expenseType;
+                " transactionCategory=" + transactionCategory + "\r\n" +
+                " transactionType=" + transactionType;
     }
 }
