@@ -31,7 +31,7 @@ public class Transaction implements Serializable {
     Account taker;
 
 
-    public Transaction(@NonNull String description, @Nullable byte[] thumbnail, @Nullable String fullImagePath, @NonNull BigDecimal amount, @NonNull Currency currency, @NonNull Calendar date, @NonNull TransactionCategory TransactionCategory, @NonNull TransactionType transactionType) {
+    public Transaction(@NonNull String description, @Nullable byte[] thumbnail, @Nullable String fullImagePath, @NonNull BigDecimal amount, @NonNull Currency currency, @NonNull Calendar date, @NonNull TransactionCategory transactionCategory, @NonNull TransactionType transactionType) {
         this.description = description;
         this.fullImagePath = fullImagePath;
         this.amount = amount;

@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,9 +26,10 @@ import java.util.List;
 
 import ve.com.abicelis.creditcardexpensemanager.R;
 import ve.com.abicelis.creditcardexpensemanager.app.activities.OcrCreateExpenseActivity;
-import ve.com.abicelis.creditcardexpensemanager.app.adapters.ExpensesAdapter;
-import ve.com.abicelis.creditcardexpensemanager.app.dialogs.CreateOrEditExpenseDialogFragment;
+import ve.com.abicelis.creditcardexpensemanager.app.adapters.TransactionAdapter;
+import ve.com.abicelis.creditcardexpensemanager.app.dialogs.CreateOrEditTransactionDialogFragment;
 import ve.com.abicelis.creditcardexpensemanager.app.holders.ExpensesViewHolder;
+import ve.com.abicelis.creditcardexpensemanager.app.holders.TransactionViewHolder;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.Constants;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.SharedPreferencesUtils;
 import ve.com.abicelis.creditcardexpensemanager.database.ExpenseManagerDAO;
@@ -38,24 +38,24 @@ import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditCardNotFoundExc
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditPeriodNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.SharedPreferenceNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.model.Account;
-import ve.com.abicelis.creditcardexpensemanager.model.CreditCard;
-import ve.com.abicelis.creditcardexpensemanager.model.Expense;
+import ve.com.abicelis.creditcardexpensemanager.model.Transaction;
 
 /**
  * Created by Alex on 3/9/2016.
  */
+//Transaction List Fragment
 public class ExpenseListFragment extends Fragment {
 
     //Data
     int activeCreditCardId = -1;
-    Account activeCreditCard = null;
-    List<Expense> creditCardExpenses = new ArrayList<>();
+    Account activeAccount = null;
+    List<Transaction> creditCardExpenses = new ArrayList<>();
     ExpenseManagerDAO mDao;
 
     //UI
     RecyclerView recyclerViewExpenses;
     LinearLayoutManager mLayoutManager;
-    ExpensesAdapter mAdapter;
+    TransactionAdapter mAdapter;
     FloatingActionMenu fabMenu;
     FloatingActionButton fabNewExpense;
     FloatingActionButton fabNewExpenseCamera;
@@ -110,7 +110,7 @@ public class ExpenseListFragment extends Fragment {
 //        AppBarLayout appBarLayout = (AppBarLayout) rootView.findViewById(R.id.home_appbar);
 //        toolbar = (Toolbar) rootView.findViewById(R.id.home_toolbar);
 
-        if(activeCreditCard != null) {
+        if(activeAccount != null) {
             setUpRecyclerView(rootView);
             setUpSwipeRefresh(rootView);
             //setUpToolbar(rootView);
@@ -178,12 +178,12 @@ public class ExpenseListFragment extends Fragment {
     private void setUpRecyclerView(View rootView) {
 
 
-        ExpensesViewHolder.ExpenseDeletedListener listener = new ExpensesViewHolder.ExpenseDeletedListener() {
+        TransactionViewHolder.TransactionDeletedListener listener = new TransactionViewHolder.TransactionDeletedListener() {
             @Override
-            public void OnExpenseDeleted(int position) {
+            public void OnTransactionDeleted(int position) {
                 try {
 
-                    mDao.deleteExpense(creditCardExpenses.get(position).getId());
+                    mDao.deleteTransaction(creditCardExpenses.get(position).getId());
                     creditCardExpenses.remove(position);
                     mAdapter.notifyItemRemoved(position);
                     mAdapter.notifyItemRangeChanged(position, mAdapter.getItemCount());
@@ -195,7 +195,7 @@ public class ExpenseListFragment extends Fragment {
             }
         };
         mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-        //mAdapter = new ExpensesAdapter(this, creditCardExpenses, activeCreditCard.getCreditPeriods().get(0).getId(), listener);
+        mAdapter = new TransactionAdapter(this, creditCardExpenses, 0, listener);
 
         DividerItemDecoration itemDecoration = new DividerItemDecoration(recyclerViewExpenses.getContext(), mLayoutManager.getOrientation());
         itemDecoration.setDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.item_decoration_half_line));
@@ -260,8 +260,8 @@ public class ExpenseListFragment extends Fragment {
             public void onClick(View view) {
                 fabMenu.close(true);
                 Intent intent = new Intent(getActivity(), OcrCreateExpenseActivity.class);
-      //          intent.putExtra(OcrCreateExpenseActivity.TAG_EXTRA_PERIOD_ID, activeCreditCard.getCreditPeriods().get(0).getId());
-                intent.putExtra(OcrCreateExpenseActivity.TAG_EXTRA_CURRENCY, activeCreditCard.getCurrency());
+      //          intent.putExtra(OcrCreateExpenseActivity.TAG_EXTRA_PERIOD_ID, activeAccount.getCreditPeriods().get(0).getId());
+                intent.putExtra(OcrCreateExpenseActivity.TAG_EXTRA_CURRENCY, activeAccount.getCurrency());
                 startActivity(intent);
             }
         });
@@ -270,20 +270,26 @@ public class ExpenseListFragment extends Fragment {
 
 
     public void refreshData() throws CreditCardNotFoundException, CreditPeriodNotFoundException {
-        //activeCreditCard = mDao.getCreditCardWithCreditPeriod(activeCreditCardId, 0);
+        try {
+            activeAccount = mDao.getAccount(activeCreditCardId);
+        }
+        catch(Exception e)
+        {
+            //shouldnt happen
+        }
 
         //Clear the list and refresh it with new data, this must be done so the mAdapter
         // doesn't lose track of creditCardExpenses object when overwriting
-        // activeCreditCard.getCreditPeriods().get(0).getExpenses();
-        //creditCardExpenses.clear();
-        //creditCardExpenses.addAll(activeCreditCard.getCreditPeriods().get(0).getExpenses());
+        // activeAccount.getCreditPeriods().get(0).getExpenses();
+        creditCardExpenses.clear();
+        creditCardExpenses.addAll(mDao.getTransactionList());
 
     }
 
 
     public void refreshRecyclerView() {
 
-        if(activeCreditCard != null) {
+        if(activeAccount != null) {
             loadDao();
 
             int oldExpensesCount = creditCardExpenses.size();
@@ -304,7 +310,7 @@ public class ExpenseListFragment extends Fragment {
             //If a new expense was added
             if(newExpensesCount == oldExpensesCount+1) {
                 mAdapter.notifyItemInserted(0);
-          //      mAdapter.notifyItemRangeChanged(1, activeCreditCard.getCreditPeriods().get(0).getExpenses().size()-1);
+          //      mAdapter.notifyItemRangeChanged(1, activeAccount.getCreditPeriods().get(0).getExpenses().size()-1);
                 mLayoutManager.scrollToPosition(0);
             } else {
                 mAdapter.notifyDataSetChanged();
@@ -324,9 +330,9 @@ public class ExpenseListFragment extends Fragment {
 
     private void showCreateExpenseDialog() {
         FragmentManager fm = getFragmentManager();
-        CreateOrEditExpenseDialogFragment dialog = CreateOrEditExpenseDialogFragment.newInstance(
+        CreateOrEditTransactionDialogFragment dialog = CreateOrEditTransactionDialogFragment.newInstance(
                 mDao,
-                activeCreditCard.getCurrency(),
+                activeAccount.getCurrency(),
                 null);
 
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -336,7 +342,7 @@ public class ExpenseListFragment extends Fragment {
                 //refreshChart();
             }
         });
-        dialog.show(fm, "fragment_dialog_create_expense");
+        dialog.show(fm, "fragment_dialog_create_transaction");
     }
 
 

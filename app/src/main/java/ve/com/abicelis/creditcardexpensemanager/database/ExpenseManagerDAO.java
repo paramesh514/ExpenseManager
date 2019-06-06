@@ -92,12 +92,32 @@ public class ExpenseManagerDAO {
         return accounts;
     }
 
+    public List<Transaction> getTransactionList() {
+
+        List<Transaction> accounts = new ArrayList<>();
+        SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
+
+        Cursor cursor = db.query(ExpenseManagerContract.TransactionTable.TABLE_NAME, null, null, null, null, null,
+                ExpenseManagerContract.TransactionTable._ID+" DESC");
+
+        try {
+            while (cursor.moveToNext()) {
+                accounts.add(getTransactionFromCursor(cursor));
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return accounts;
+    }
+
     public List<TransactionCategory> getTransactionCategoryList() {
 
         List<TransactionCategory> transactionCategories = new ArrayList<>();
         SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
 
-        Cursor cursor = db.query(ExpenseManagerContract.TransactionCategoryTable.TABLE_NAME, null, null, null, null, null, null);
+        Cursor cursor = db.query(ExpenseManagerContract.TransactionCategoryTable.TABLE_NAME, null, null, null, null, null,
+                ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_BUDGET.getName()+" DESC");
 
         try {
             while (cursor.moveToNext()) {

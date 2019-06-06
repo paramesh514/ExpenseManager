@@ -112,10 +112,10 @@ public class OverviewFragment extends Fragment {
 
                 /* DatePeriod bar */
                 Calendar today = Calendar.getInstance();
-        //        Calendar startDate = activeCreditCard.getCreditPeriods().get(0).getStartDate();
-          //      Calendar endDate = activeCreditCard.getCreditPeriods().get(0).getEndDate();
+        //        Calendar startDate = activeAccount.getCreditPeriods().get(0).getStartDate();
+          //      Calendar endDate = activeAccount.getCreditPeriods().get(0).getEndDate();
                // int daysBetweenStartAndToday = DateUtils.getDaysBetween(startDate, today);
-            //    int daysInPeriod = activeCreditCard.getCreditPeriods().get(0).getTotalDaysInPeriod();
+            //    int daysInPeriod = activeAccount.getCreditPeriods().get(0).getTotalDaysInPeriod();
                 int datePeriodPercentage;
               //  if(daysInPeriod > 0)
                 //    datePeriodPercentage = (int)(100*((float)daysBetweenStartAndToday/daysInPeriod));
@@ -124,8 +124,8 @@ public class OverviewFragment extends Fragment {
 
 
                 /* Balance bar */
-                //int creditLimit = activeCreditCard.getCreditPeriods().get(0).getCreditLimit().toBigInteger().intValue();
-                //int expensesTotal = activeCreditCard.getCreditPeriods().get(0).getExpensesTotal().toBigInteger().intValue();
+                //int creditLimit = activeAccount.getCreditPeriods().get(0).getCreditLimit().toBigInteger().intValue();
+                //int expensesTotal = activeAccount.getCreditPeriods().get(0).getExpensesTotal().toBigInteger().intValue();
                 String currencyCode = activeCreditCard.getCurrency().getCode();
                 int balancePercentage;
                 //if(creditLimit > 0)
@@ -173,7 +173,7 @@ int expensesTotal = 100;
 
         BigDecimal maxDailyExpense = new BigDecimal(0);
         String maxDailyExpenseDate = null;
-        /*List<DailyExpense> dailyExpenses = activeCreditCard.getCreditPeriods().get(0).getDailyExpenses();
+        /*List<DailyExpense> dailyExpenses = activeAccount.getCreditPeriods().get(0).getDailyExpenses();
         for(DailyExpense de : dailyExpenses) {
             if(de.getAmount().compareTo(maxDailyExpense) == 1) {  //If current larger than max
                 maxDailyExpense = de.getAmount();
@@ -188,8 +188,8 @@ int expensesTotal = 100;
 
 
 
-        /*List<BigDecimal> expensesByCategory = activeCreditCard.getCreditPeriods().get(0).getExpensesByCategory();
-        BigDecimal expenseTotal = activeCreditCard.getCreditPeriods().get(0).getExpensesTotal();*/
+        /*List<BigDecimal> expensesByCategory = activeAccount.getCreditPeriods().get(0).getExpensesByCategory();
+        BigDecimal expenseTotal = activeAccount.getCreditPeriods().get(0).getExpensesTotal();*/
         BigDecimal maxCategory = new BigDecimal(0);
         String maxCategoryName = "";
 
@@ -212,12 +212,12 @@ int expensesTotal = 100;
 */
 
         Calendar today = Calendar.getInstance();
-        //Calendar startDate = activeCreditCard.getCreditPeriods().get(0).getStartDate();
-        //Calendar endDate = activeCreditCard.getCreditPeriods().get(0).getEndDate();
+        //Calendar startDate = activeAccount.getCreditPeriods().get(0).getStartDate();
+        //Calendar endDate = activeAccount.getCreditPeriods().get(0).getEndDate();
         //int daysBetweenStartAndToday = DateUtils.getDaysBetween(startDate, today);
         //int daysBetweenTodayAndEnd = DateUtils.getDaysBetween(today, endDate);
-        //BigDecimal expensesTotal = activeCreditCard.getCreditPeriods().get(0).getExpensesTotal();
-        //BigDecimal creditLimit = activeCreditCard.getCreditPeriods().get(0).getCreditLimit();
+        //BigDecimal expensesTotal = activeAccount.getCreditPeriods().get(0).getExpensesTotal();
+        //BigDecimal creditLimit = activeAccount.getCreditPeriods().get(0).getCreditLimit();
         //BigDecimal creditToSpend = creditLimit.subtract(expensesTotal);
         String currencyCode = activeCreditCard.getCurrency().getCode();
 /*
@@ -267,7 +267,7 @@ int expensesTotal = 100;
                 @Override
                 public void onDismiss(DialogInterface dialogInterface) {
                     try {
-                       // activeCreditCard = dao.getCreditCardWithCreditPeriod(activeCreditCardId, 0);
+                       // activeAccount = dao.getCreditCardWithCreditPeriod(activeCreditCardId, 0);
                         refreshUI();
                     }catch (Exception e) {
                         Toast.makeText(getActivity(), "Error refreshing credit card data", Toast.LENGTH_SHORT).show();

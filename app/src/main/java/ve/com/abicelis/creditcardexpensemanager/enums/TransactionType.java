@@ -23,7 +23,10 @@ public enum TransactionType {
     public String getFriendlyName() {
         return mFriendlyName;
     }
-
+    public int getColor()
+    {
+        return 0;
+    }
     @Override
     public String toString() {
         return this.mFriendlyName;
