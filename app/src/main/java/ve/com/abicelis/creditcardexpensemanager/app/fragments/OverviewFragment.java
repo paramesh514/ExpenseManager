@@ -81,7 +81,7 @@ public class OverviewFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_overview, container, false);
 
         //headerCreditCardContainer = view.findViewById(R.id.list_item_credit_card_container);
-      //  creditDatePeriodBar = (HorizontalBar) view.findViewById(R.id.frag_overview_credit_date_period_bar);
+      // creditDatePeriodBar = (HorizontalBar) view.findViewById(R.id.frag_overview_credit_date_period_bar);
         creditBalanceBar = (HorizontalBar) view.findViewById(R.id.frag_overview_credit_balance_bar);
         //extraInfo = (TextView) view.findViewById(R.id.frag_overview_extra_info);
         scrollViewContainer = (ScrollView) view.findViewById(R.id.frag_overview_body_scroll_view_container);
@@ -99,12 +99,18 @@ public class OverviewFragment extends Fragment {
 
     private void refreshUI() {
         loadDao();
+        try {
+            activeCreditCard = dao.getAccount(activeCreditCardId);
+        }
+        catch (Exception e)
+        {
 
+        }
         //Hide all
         scrollViewContainer.setVisibility(View.GONE);
      //   headerCreditCardContainer.setVisibility(View.GONE);
 
-        if (activeCreditCard != null) {
+
             try {
 
                 scrollViewContainer.setVisibility(View.VISIBLE);
@@ -126,7 +132,7 @@ public class OverviewFragment extends Fragment {
                 /* Balance bar */
                 //int creditLimit = activeAccount.getCreditPeriods().get(0).getCreditLimit().toBigInteger().intValue();
                 //int expensesTotal = activeAccount.getCreditPeriods().get(0).getExpensesTotal().toBigInteger().intValue();
-                String currencyCode = activeCreditCard.getCurrency().getCode();
+                String currencyCode = "INR";
                 int balancePercentage;
                 //if(creditLimit > 0)
                   //  balancePercentage = (int)(100*((float)expensesTotal/creditLimit));
@@ -134,7 +140,7 @@ public class OverviewFragment extends Fragment {
                   //  balancePercentage = 0;
 int creditLimit = 1000;
 int expensesTotal = 100;
-                creditBalanceBar.setProgressPercentage(10);
+                creditBalanceBar.setProgressPercentage(30);
                 creditBalanceBar.setTextHi(creditLimit + " " + currencyCode);
                 if(expensesTotal > 0)
                     creditBalanceBar.setTextBar(Integer.toString(expensesTotal) + " " + currencyCode);
@@ -152,9 +158,7 @@ int expensesTotal = 100;
                 e.printStackTrace();
             }
 
-        } else {
-            //errNoCC.setVisibility(View.VISIBLE);
-        }
+
     }
 
     private String generateExtraInfo() {
