@@ -54,9 +54,12 @@ import ve.com.abicelis.creditcardexpensemanager.database.ExpenseManagerDAO;
 import ve.com.abicelis.creditcardexpensemanager.enums.Currency;
 import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseCategory;
 import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseType;
+import ve.com.abicelis.creditcardexpensemanager.enums.TransactionType;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotInsertDataException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotUpdateDataException;
 import ve.com.abicelis.creditcardexpensemanager.model.Expense;
+import ve.com.abicelis.creditcardexpensemanager.model.Transaction;
+import ve.com.abicelis.creditcardexpensemanager.model.TransactionCategory;
 
 /**
  * Created by Alex on 9/8/2016.
@@ -88,11 +91,12 @@ public class CreateOrEditExpenseDialogFragment extends AppCompatDialogFragment i
 
     //DATA
     private Expense mOriginalExpense = null;
-    int mCreditPeriodId = -1;
+   //
+   // int mCreditPeriodId = -1;
     Currency mCurrency = null;
     byte[] expenseImageThumbnailBytes;
-    List<ExpenseCategory> expenseCategories;
-    List<ExpenseType> expenseTypes;
+    List<TransactionCategory> expenseCategories;
+    List<TransactionType> expenseTypes;
 
     private Uri imageUri;
     private String imagePath = null;
@@ -104,10 +108,10 @@ public class CreateOrEditExpenseDialogFragment extends AppCompatDialogFragment i
         // Use `newInstance` instead as shown below
     }
 
-    public static CreateOrEditExpenseDialogFragment newInstance(ExpenseManagerDAO dao, int creditPeriodId, @NonNull  Currency currency, @Nullable Expense originalExpense) {
+    public static CreateOrEditExpenseDialogFragment newInstance(ExpenseManagerDAO dao,  @NonNull  Currency currency, @Nullable Expense originalExpense) {
         CreateOrEditExpenseDialogFragment frag = new CreateOrEditExpenseDialogFragment();
         Bundle args = new Bundle();
-        args.putInt(TAG_ARGS_PERIOD_ID, creditPeriodId);
+        //args.putInt(TAG_ARGS_PERIOD_ID, creditPeriodId);
         args.putSerializable(TAG_ARGS_CURRENCY, currency);
         if(originalExpense != null)
             args.putSerializable(TAG_ARGS_ORIGINAL_EXPENSE, originalExpense);
@@ -142,12 +146,12 @@ public class CreateOrEditExpenseDialogFragment extends AppCompatDialogFragment i
         // Fetch arguments from bundle and set title
         mCurrency = (Currency) getArguments().getSerializable(TAG_ARGS_CURRENCY);
         mOriginalExpense = (Expense) getArguments().getSerializable(TAG_ARGS_ORIGINAL_EXPENSE);
-        mCreditPeriodId =  getArguments().getInt(TAG_ARGS_PERIOD_ID, -1);
+        //mCreditPeriodId =  getArguments().getInt(TAG_ARGS_PERIOD_ID, -1);
 
-        if(mCreditPeriodId == -1 || mCurrency == null) {
-            Toast.makeText(getActivity(), "Error, wrong arguments passed. Dismissing dialog.", Toast.LENGTH_SHORT).show();
-            dismiss();
-        }
+       // if(mCreditPeriodId == -1 || mCurrency == null) {
+         //   Toast.makeText(getActivity(), "Error, wrong arguments passed. Dismissing dialog.", Toast.LENGTH_SHORT).show();
+         //   dismiss();
+        //}
 
         // Get fields from view
         mAmountText = (EditText) view.findViewById(R.id.dialog_create_expense_amount);
@@ -169,12 +173,12 @@ public class CreateOrEditExpenseDialogFragment extends AppCompatDialogFragment i
         mImage.setOnClickListener(this);
 
         //Set spinners
-        expenseCategories = new ArrayList<>(Arrays.asList(ExpenseCategory.values()));
+        expenseCategories = mDao.getTransactionCategoryList();
         ArrayAdapter expenseCategoryAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, expenseCategories);
         expenseCategoryAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         mExpenseCategory.setAdapter(expenseCategoryAdapter);
 
-        expenseTypes = new ArrayList<>(Arrays.asList(ExpenseType.values()));
+        expenseTypes = new ArrayList<>(Arrays.asList(TransactionType.values()));
         ArrayAdapter expenseTypeAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, expenseTypes);
         expenseTypeAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         mExpenseType.setAdapter(expenseTypeAdapter);
@@ -452,8 +456,8 @@ public class CreateOrEditExpenseDialogFragment extends AppCompatDialogFragment i
             return;
         }
 
-        ExpenseCategory expenseCategory = expenseCategories.get(mExpenseCategory.getSelectedItemPosition());
-        ExpenseType expenseType = expenseTypes.get(mExpenseType.getSelectedItemPosition());
+        TransactionCategory expenseCategory = expenseCategories.get(mExpenseCategory.getSelectedItemPosition());
+        TransactionType expenseType = expenseTypes.get(mExpenseType.getSelectedItemPosition());
 
         //If a temp photo was ever taken, copy tempFile to photoFile, then delete tempFile!
         if(tempImagePath != null) {
@@ -492,20 +496,20 @@ public class CreateOrEditExpenseDialogFragment extends AppCompatDialogFragment i
         //If editing an expense, update it
         if(mOriginalExpense != null) {
             try {
-                Expense expense = new Expense(mOriginalExpense.getId(), description, expenseImageThumbnailBytes, imagePath,
+                Transaction expense = new Transaction(mOriginalExpense.getId(), description, expenseImageThumbnailBytes, imagePath,
                         new BigDecimal(mAmountText.getText().toString()), mCurrency,
                         mOriginalExpense.getDate(), expenseCategory, expenseType);
-                mDao.updateExpense(expense);
+                mDao.updateTransaction(expense);
             } catch (CouldNotUpdateDataException e) {
                 Toast.makeText(getActivity(), "There was a problem updating the Expense", Toast.LENGTH_SHORT).show();
             }
         } else {
             //Otherwise, insert a new expense
             try {
-                Expense expense = new Expense(description, expenseImageThumbnailBytes, imagePath,
+                Transaction expense = new Transaction(description, expenseImageThumbnailBytes, imagePath,
                         new BigDecimal(mAmountText.getText().toString()), mCurrency,
                         Calendar.getInstance(), expenseCategory, expenseType);
-                mDao.insertExpense(mCreditPeriodId, expense);
+                mDao.insertTransaction(expense);
             } catch (CouldNotInsertDataException e) {
                 Toast.makeText(getActivity(), "There was a problem inserting the Expense", Toast.LENGTH_SHORT).show();
             }

@@ -23,6 +23,7 @@ import java.util.Locale;
 
 import ve.com.abicelis.creditcardexpensemanager.R;
 import ve.com.abicelis.creditcardexpensemanager.app.dialogs.CheckCreditPeriodLimitDialogFragment;
+import ve.com.abicelis.creditcardexpensemanager.app.holders.SelectableAccountViewHolder;
 import ve.com.abicelis.creditcardexpensemanager.app.holders.SelectableCreditCardViewHolder;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.Constants;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.DateUtils;
@@ -34,6 +35,7 @@ import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseCategory;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditCardNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditPeriodNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.SharedPreferenceNotFoundException;
+import ve.com.abicelis.creditcardexpensemanager.model.Account;
 import ve.com.abicelis.creditcardexpensemanager.model.CreditCard;
 import ve.com.abicelis.creditcardexpensemanager.model.DailyExpense;
 
@@ -48,11 +50,11 @@ public class OverviewFragment extends Fragment {
 
     //DATA
     int activeCreditCardId = -1;
-    CreditCard activeCreditCard = null;
+    Account activeCreditCard = null;
     ExpenseManagerDAO dao;
 
     //UI
-    SelectableCreditCardViewHolder holder;
+    SelectableAccountViewHolder holder;
    // View headerCreditCardContainer;
     //HorizontalBar creditDatePeriodBar;
     HorizontalBar creditBalanceBar;
@@ -70,18 +72,6 @@ public class OverviewFragment extends Fragment {
         super.onCreate(savedInstanceState);
         loadDao();
 
-        try {
-            activeCreditCardId = SharedPreferencesUtils.getInt(getContext(), Constants.ACTIVE_CC_ID);
-            try {
-                activeCreditCard = dao.getCreditCardWithCreditPeriod(activeCreditCardId, 0);
-            }catch (CreditCardNotFoundException e ) {
-                Toast.makeText(getActivity(), getResources().getString(R.string.err_problem_loading_card_or_no_card_exists), Toast.LENGTH_SHORT).show();
-            }catch (CreditPeriodNotFoundException e) {
-                createACurrentCreditPeriod();
-            }
-        }catch(SharedPreferenceNotFoundException e) {
-            //This shouldn't happen
-        }
 
     }
 
@@ -122,28 +112,29 @@ public class OverviewFragment extends Fragment {
 
                 /* DatePeriod bar */
                 Calendar today = Calendar.getInstance();
-                Calendar startDate = activeCreditCard.getCreditPeriods().get(0).getStartDate();
-                Calendar endDate = activeCreditCard.getCreditPeriods().get(0).getEndDate();
-                int daysBetweenStartAndToday = DateUtils.getDaysBetween(startDate, today);
-                int daysInPeriod = activeCreditCard.getCreditPeriods().get(0).getTotalDaysInPeriod();
+        //        Calendar startDate = activeCreditCard.getCreditPeriods().get(0).getStartDate();
+          //      Calendar endDate = activeCreditCard.getCreditPeriods().get(0).getEndDate();
+               // int daysBetweenStartAndToday = DateUtils.getDaysBetween(startDate, today);
+            //    int daysInPeriod = activeCreditCard.getCreditPeriods().get(0).getTotalDaysInPeriod();
                 int datePeriodPercentage;
-                if(daysInPeriod > 0)
-                    datePeriodPercentage = (int)(100*((float)daysBetweenStartAndToday/daysInPeriod));
-                else
-                    datePeriodPercentage = 0;
+              //  if(daysInPeriod > 0)
+                //    datePeriodPercentage = (int)(100*((float)daysBetweenStartAndToday/daysInPeriod));
+                //else
+                  //  datePeriodPercentage = 0;
 
 
                 /* Balance bar */
-                int creditLimit = activeCreditCard.getCreditPeriods().get(0).getCreditLimit().toBigInteger().intValue();
-                int expensesTotal = activeCreditCard.getCreditPeriods().get(0).getExpensesTotal().toBigInteger().intValue();
+                //int creditLimit = activeCreditCard.getCreditPeriods().get(0).getCreditLimit().toBigInteger().intValue();
+                //int expensesTotal = activeCreditCard.getCreditPeriods().get(0).getExpensesTotal().toBigInteger().intValue();
                 String currencyCode = activeCreditCard.getCurrency().getCode();
                 int balancePercentage;
-                if(creditLimit > 0)
-                    balancePercentage = (int)(100*((float)expensesTotal/creditLimit));
-                else
-                    balancePercentage = 0;
-
-                creditBalanceBar.setProgressPercentage(balancePercentage);
+                //if(creditLimit > 0)
+                  //  balancePercentage = (int)(100*((float)expensesTotal/creditLimit));
+                //else
+                  //  balancePercentage = 0;
+int creditLimit = 1000;
+int expensesTotal = 100;
+                creditBalanceBar.setProgressPercentage(10);
                 creditBalanceBar.setTextHi(creditLimit + " " + currencyCode);
                 if(expensesTotal > 0)
                     creditBalanceBar.setTextBar(Integer.toString(expensesTotal) + " " + currencyCode);
@@ -182,13 +173,13 @@ public class OverviewFragment extends Fragment {
 
         BigDecimal maxDailyExpense = new BigDecimal(0);
         String maxDailyExpenseDate = null;
-        List<DailyExpense> dailyExpenses = activeCreditCard.getCreditPeriods().get(0).getDailyExpenses();
+        /*List<DailyExpense> dailyExpenses = activeCreditCard.getCreditPeriods().get(0).getDailyExpenses();
         for(DailyExpense de : dailyExpenses) {
             if(de.getAmount().compareTo(maxDailyExpense) == 1) {  //If current larger than max
                 maxDailyExpense = de.getAmount();
                 maxDailyExpenseDate = de.getFormattedDate();
             }
-        }
+        }*/
 
         if(maxDailyExpenseDate != null)
             extraInfos.add(String.format(Locale.getDefault(), info1, maxDailyExpenseDate, maxDailyExpense.toBigInteger().toString(), activeCreditCard.getCurrency().getCode()));
@@ -197,14 +188,14 @@ public class OverviewFragment extends Fragment {
 
 
 
-        List<BigDecimal> expensesByCategory = activeCreditCard.getCreditPeriods().get(0).getExpensesByCategory();
-        BigDecimal expenseTotal = activeCreditCard.getCreditPeriods().get(0).getExpensesTotal();
+        /*List<BigDecimal> expensesByCategory = activeCreditCard.getCreditPeriods().get(0).getExpensesByCategory();
+        BigDecimal expenseTotal = activeCreditCard.getCreditPeriods().get(0).getExpensesTotal();*/
         BigDecimal maxCategory = new BigDecimal(0);
         String maxCategoryName = "";
 
 
 
-        if(expenseTotal.compareTo(BigDecimal.ZERO) == 1) {
+  /*      if(expenseTotal.compareTo(BigDecimal.ZERO) == 1) {
 
             for(int i = 0; i < ExpenseCategory.values().length; i++) {
                 if(expensesByCategory.get(i).compareTo(maxCategory) == 1) {  //If current larger than max
@@ -218,18 +209,18 @@ public class OverviewFragment extends Fragment {
             extraInfos.add(String.format(Locale.getDefault(), info2, maxCategoryName,  percentOfTotalMaxCategory.toBigInteger().toString()));
         }
 
-
+*/
 
         Calendar today = Calendar.getInstance();
-        Calendar startDate = activeCreditCard.getCreditPeriods().get(0).getStartDate();
-        Calendar endDate = activeCreditCard.getCreditPeriods().get(0).getEndDate();
-        int daysBetweenStartAndToday = DateUtils.getDaysBetween(startDate, today);
-        int daysBetweenTodayAndEnd = DateUtils.getDaysBetween(today, endDate);
-        BigDecimal expensesTotal = activeCreditCard.getCreditPeriods().get(0).getExpensesTotal();
-        BigDecimal creditLimit = activeCreditCard.getCreditPeriods().get(0).getCreditLimit();
-        BigDecimal creditToSpend = creditLimit.subtract(expensesTotal);
+        //Calendar startDate = activeCreditCard.getCreditPeriods().get(0).getStartDate();
+        //Calendar endDate = activeCreditCard.getCreditPeriods().get(0).getEndDate();
+        //int daysBetweenStartAndToday = DateUtils.getDaysBetween(startDate, today);
+        //int daysBetweenTodayAndEnd = DateUtils.getDaysBetween(today, endDate);
+        //BigDecimal expensesTotal = activeCreditCard.getCreditPeriods().get(0).getExpensesTotal();
+        //BigDecimal creditLimit = activeCreditCard.getCreditPeriods().get(0).getCreditLimit();
+        //BigDecimal creditToSpend = creditLimit.subtract(expensesTotal);
         String currencyCode = activeCreditCard.getCurrency().getCode();
-
+/*
         if(expensesTotal.compareTo(BigDecimal.ZERO) == 1 && daysBetweenStartAndToday > 0) {
             BigDecimal average = expensesTotal.divide(new BigDecimal(daysBetweenStartAndToday), 1, RoundingMode.HALF_UP);
             average = average.setScale(1, RoundingMode.HALF_UP);
@@ -243,7 +234,7 @@ public class OverviewFragment extends Fragment {
             extraInfos.add(String.format(Locale.getDefault(), info4, creditToSpend.toPlainString(), averageToSpend.toPlainString(), currencyCode));
         }
 
-
+*/
 
 
 
@@ -276,7 +267,7 @@ public class OverviewFragment extends Fragment {
                 @Override
                 public void onDismiss(DialogInterface dialogInterface) {
                     try {
-                        activeCreditCard = dao.getCreditCardWithCreditPeriod(activeCreditCardId, 0);
+                       // activeCreditCard = dao.getCreditCardWithCreditPeriod(activeCreditCardId, 0);
                         refreshUI();
                     }catch (Exception e) {
                         Toast.makeText(getActivity(), "Error refreshing credit card data", Toast.LENGTH_SHORT).show();

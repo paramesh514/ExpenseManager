@@ -115,6 +115,20 @@ public class Account implements Serializable {
     public Calendar getBalanceUpdated() {
         return balanceUpdated;
     }
+    public String getLongCardExpirationString() {
+        if(balanceUpdated == null)
+            return "-";
+
+        SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+        return formatter.format(balanceUpdated.getTime());
+    }
+    public String getShortCardExpirationString() {
+        if(balanceUpdated == null)
+            return "-/-";
+
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/yy", Locale.getDefault());
+        return formatter.format(balanceUpdated.getTime());
+    }
 
     public void setBalanceUpdated(Calendar balanceUpdated) {
         this.balanceUpdated = Calendar.getInstance();

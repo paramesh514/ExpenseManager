@@ -144,6 +144,7 @@ public class NavigationDrawerFragment extends Fragment {
         data.add(new NavigationDrawerItem(getResources().getString(R.string.fragment_name_overview), R.drawable.icon_overview));
         data.add(new NavigationDrawerItem(getResources().getString(R.string.fragment_name_expense_list), R.drawable.icon_expenses));
         data.add(new NavigationDrawerItem(getResources().getString(R.string.fragment_name_graphs), R.drawable.icon_chart));
+        data.add(new NavigationDrawerItem(getResources().getString(R.string.fragment_name_budget), R.drawable.icon_expenses));
         data.add(new NavigationDrawerItem(getResources().getString(R.string.fragment_name_credit_cards), R.drawable.icon_credit_card));
         data.add(new NavigationDrawerItem(getResources().getString(R.string.fragment_name_preferences), R.drawable.icon_settings));
         data.add(new NavigationDrawerItem(getResources().getString(R.string.fragment_name_about), R.drawable.icon_about));

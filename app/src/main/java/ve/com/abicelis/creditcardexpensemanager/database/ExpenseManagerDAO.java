@@ -14,21 +14,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ve.com.abicelis.creditcardexpensemanager.enums.AccountType;
 import ve.com.abicelis.creditcardexpensemanager.enums.CreditCardBackground;
 import ve.com.abicelis.creditcardexpensemanager.enums.CreditCardType;
 import ve.com.abicelis.creditcardexpensemanager.enums.Currency;
 import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseCategory;
 import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseType;
+import ve.com.abicelis.creditcardexpensemanager.enums.TransactionType;
+import ve.com.abicelis.creditcardexpensemanager.exceptions.AccountNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotDeleteDataException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotUpdateDataException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditCardNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditPeriodNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotGetDataException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotInsertDataException;
+import ve.com.abicelis.creditcardexpensemanager.model.Account;
 import ve.com.abicelis.creditcardexpensemanager.model.CreditCard;
 import ve.com.abicelis.creditcardexpensemanager.model.CreditPeriod;
 import ve.com.abicelis.creditcardexpensemanager.model.Expense;
 import ve.com.abicelis.creditcardexpensemanager.model.Payment;
+import ve.com.abicelis.creditcardexpensemanager.model.Transaction;
+import ve.com.abicelis.creditcardexpensemanager.model.TransactionCategory;
 
 /**
  * Created by Alex on 8/8/2016.
@@ -64,6 +70,45 @@ public class ExpenseManagerDAO {
         return creditCards;
     }
 
+    /**
+     * Returns a List of stored Accounts.
+     * Note: The Credit Cards will not contain CreditPeriods, Expenses or Payments.
+     */
+    public List<Account> getAccountList() {
+
+        List<Account> accounts = new ArrayList<>();
+        SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
+
+        Cursor cursor = db.query(ExpenseManagerContract.AccountTable.TABLE_NAME, null, null, null, null, null, null);
+
+        try {
+            while (cursor.moveToNext()) {
+                accounts.add(getAccountFromCursor(cursor));
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return accounts;
+    }
+
+    public List<TransactionCategory> getTransactionCategoryList() {
+
+        List<TransactionCategory> transactionCategories = new ArrayList<>();
+        SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
+
+        Cursor cursor = db.query(ExpenseManagerContract.TransactionCategoryTable.TABLE_NAME, null, null, null, null, null, null);
+
+        try {
+            while (cursor.moveToNext()) {
+                transactionCategories.add(getTransactionCategoryFromCursor(cursor));
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return transactionCategories;
+    }
     /**
      * Returns a List of CreditPeriods associated with ccardId.
      * Note: The periods will not contain Expenses or Payments.
@@ -110,6 +155,44 @@ public class ExpenseManagerDAO {
         cursor.moveToNext();
         return getCreditCardFromCursor(cursor);
     }
+
+    /**
+     * Finds a CreditCard with the supplied cardId, will not return creditPeriods associated with
+     * the card
+     * @param accId The ID of the Account
+     */
+    public Account getAccount(int accId) throws AccountNotFoundException {
+        String[] selectionArgs = new String[]{String.valueOf(accId)};
+        SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
+
+        Cursor cursor =  db.query(ExpenseManagerContract.AccountTable.TABLE_NAME, null,
+                ExpenseManagerContract.AccountTable._ID + " =? ", selectionArgs, null, null, null);
+
+        if(cursor.getCount() == 0)
+            throw new AccountNotFoundException("Specified Credit Card not found in the database. Passed value=" + accId);
+        if(cursor.getCount() > 1)
+            throw new AccountNotFoundException("Database UNIQUE constraint failure, more than one record found. Passed value=" + accId);
+
+        cursor.moveToNext();
+        return getAccountFromCursor(cursor);
+    }
+
+    public TransactionCategory getTransactionCategory(String catId) {
+        String[] selectionArgs = new String[]{String.valueOf(catId)};
+        SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
+
+        Cursor cursor =  db.query(ExpenseManagerContract.TransactionCategoryTable.TABLE_NAME, null,
+                ExpenseManagerContract.TransactionCategoryTable._ID + " =? ", selectionArgs, null, null, null);
+
+        if(cursor.getCount() == 0)
+            return TransactionCategory.getDefault();
+        if(cursor.getCount() > 1)
+            return TransactionCategory.getDefault();
+
+        cursor.moveToNext();
+        return getTransactionCategoryFromCursor(cursor);
+    }
+
 
     /**
      * Returns a Credit Card with the supplied cardId and the specified periodIndex.
@@ -307,6 +390,23 @@ public class ExpenseManagerDAO {
         return getExpenseFromCursor(cursor);
     }
 
+    public Transaction getTransaction(int transId) throws CouldNotGetDataException {
+        SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
+        String[] selectionArgs = new String[]{String.valueOf(transId)};
+
+
+        Cursor cursor =  db.query(ExpenseManagerContract.ExpenseTable.TABLE_NAME, null,
+                ExpenseManagerContract.ExpenseTable._ID + " =? ",
+                selectionArgs, null, null, null);
+
+
+        if(cursor.getCount() == 0)
+            throw new CouldNotGetDataException("Expense not found for ID = " + transId);
+
+
+        cursor.moveToNext();
+        return getTransactionFromCursor(cursor);
+    }
 
 
     /* Delete data from database */
@@ -329,6 +429,20 @@ public class ExpenseManagerDAO {
 
         return db.delete(ExpenseManagerContract.CreditCardTable.TABLE_NAME,
                 ExpenseManagerContract.CreditCardTable._ID + " =?",
+                whereArgs) > 0;
+    }
+
+    /**
+     * Deletes a credit card, with its associated credit periods, expenses and payments
+     */
+    public boolean deleteAccount(int accId) throws CouldNotDeleteDataException {
+
+        //Finally, delete the credit card
+        SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
+        String[] whereArgs = new String[]{String.valueOf(accId)};
+
+        return db.delete(ExpenseManagerContract.AccountTable.TABLE_NAME,
+                ExpenseManagerContract.AccountTable._ID + " =?",
                 whereArgs) > 0;
     }
 
@@ -360,6 +474,14 @@ public class ExpenseManagerDAO {
                 whereArgs) > 0;
     }
 
+    public boolean deleteTransaction(int transId) throws CouldNotDeleteDataException {
+        SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
+        String[] whereArgs = new String[]{String.valueOf(transId)};
+
+        return db.delete(ExpenseManagerContract.TransactionTable.TABLE_NAME,
+                ExpenseManagerContract.TransactionTable._ID + " =?",
+                whereArgs) > 0;
+    }
 
 
     public boolean deletePaymentsFromCreditPeriod(int creditPeriodId) throws CouldNotDeleteDataException {
@@ -402,6 +524,25 @@ public class ExpenseManagerDAO {
 
         return count;
     }
+    /* Update data on database */
+    public long updateAccount(Account account) throws CouldNotUpdateDataException {
+        SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
+
+        //Set values
+        ContentValues values = getValuesFromAccount(account);
+
+        //Which row to update
+        String selection = ExpenseManagerContract.AccountTable._ID + " =? ";
+        String[] selectionArgs = { String.valueOf(account.getId()) };
+
+        int count = db.update(
+                ExpenseManagerContract.AccountTable.TABLE_NAME,
+                values,
+                selection,
+                selectionArgs);
+
+        return count;
+    }
 
     public long updateExpense(Expense expense) throws CouldNotUpdateDataException {
         SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
@@ -412,6 +553,25 @@ public class ExpenseManagerDAO {
         //Which row to update
         String selection = ExpenseManagerContract.ExpenseTable._ID + " =? ";
         String[] selectionArgs = { String.valueOf(expense.getId()) };
+
+        int count = db.update(
+                ExpenseManagerContract.ExpenseTable.TABLE_NAME,
+                values,
+                selection,
+                selectionArgs);
+
+        return count;
+    }
+
+    public long updateTransaction(Transaction transaction) throws CouldNotUpdateDataException {
+        SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
+
+        //Set values
+        ContentValues values = getValuesFromTransaction(transaction);
+
+        //Which row to update
+        String selection = ExpenseManagerContract.ExpenseTable._ID + " =? ";
+        String[] selectionArgs = { String.valueOf(transaction.getId()) };
 
         int count = db.update(
                 ExpenseManagerContract.ExpenseTable.TABLE_NAME,
@@ -472,6 +632,31 @@ public class ExpenseManagerDAO {
             //Insert first creditPeriod
             insertCurrentCreditPeriod(newRowId, creditcard.getClosingDay(), firstCreditPeriodLimit);
         }
+
+        return newRowId;
+
+    }
+
+    public long insertAccount(Account account) throws CouldNotInsertDataException {
+        SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_NICK_NAME.getName(), account.getNickName());
+        values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_BANK_NAME.getName(), account.getBankName());
+        values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_NUMBER.getName(), account.getAccNumber());
+        values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_CURRENCY.getName(), account.getCurrency().getCode());
+        values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_TYPE.getName(), account.getAccountType().getCode());
+        //values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_CLOSING_DAY.getName(), account.getClosingDay());
+        //values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_DUE_DAY.getName(), account.getDueDay());
+        //values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_BACKGROUND.getName(), account.getCreditCardBackground().getCode());
+
+        if(account.getBalanceUpdated() != null)
+            values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE_UPDATE.getName(), account.getBalanceUpdated().getTimeInMillis());
+        else
+            values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE_UPDATE.getName(), "");
+
+        long newRowId;
+        newRowId = db.insert(ExpenseManagerContract.AccountTable.TABLE_NAME, null, values);
 
         return newRowId;
 
@@ -545,6 +730,19 @@ public class ExpenseManagerDAO {
         return newRowId;
     }
 
+    public long insertTransaction( Transaction expense) throws CouldNotInsertDataException {
+        SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
+
+        ContentValues values = getValuesFromTransaction(expense);
+
+        long newRowId;
+        newRowId = db.insert(ExpenseManagerContract.TransactionTable.TABLE_NAME, null, values);
+
+        if(newRowId == -1)
+            throw new CouldNotInsertDataException("There was a problem inserting the Expense: " + expense.toString());
+
+        return newRowId;
+    }
 
     public long insertPayment(int creditPeriodId, Payment payment) throws CouldNotInsertDataException {
         SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
@@ -582,6 +780,20 @@ public class ExpenseManagerDAO {
         return values;
     }
 
+    /* Model to ContentValues */
+    private ContentValues getValuesFromTransaction(Transaction transaction) {
+        ContentValues values = new ContentValues();
+        values.put(ExpenseManagerContract.TransactionTable.COLUMN_NAME_DESCRIPTION.getName(), transaction.getDescription());
+        values.put(ExpenseManagerContract.TransactionTable.COLUMN_NAME_THUMBNAIL.getName(), transaction.getThumbnail());
+        values.put(ExpenseManagerContract.TransactionTable.COLUMN_NAME_FULL_IMAGE_PATH.getName(), transaction.getFullImagePath());
+        values.put(ExpenseManagerContract.TransactionTable.COLUMN_NAME_AMOUNT.getName(), transaction.getAmount().toPlainString());
+        values.put(ExpenseManagerContract.TransactionTable.COLUMN_NAME_CURRENCY.getName(), transaction.getCurrency().getCode());
+        values.put(ExpenseManagerContract.TransactionTable.COLUMN_NAME_DATE.getName(), transaction.getDate().getTimeInMillis());
+        values.put(ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_CATEGORY.getName(), transaction.getTransactionCategory().getId());
+        values.put(ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_TYPE.getName(), transaction.getTransactionType().getCode());
+        return values;
+    }
+
     private ContentValues getValuesFromCreditCard(CreditCard creditCard) {
         ContentValues values = new ContentValues();
         values.put(ExpenseManagerContract.CreditCardTable.COLUMN_NAME_CARD_ALIAS.getName(), creditCard.getCardAlias());
@@ -593,6 +805,20 @@ public class ExpenseManagerDAO {
         values.put(ExpenseManagerContract.CreditCardTable.COLUMN_NAME_CLOSING_DAY.getName(), creditCard.getClosingDay());
         values.put(ExpenseManagerContract.CreditCardTable.COLUMN_NAME_DUE_DAY.getName(), creditCard.getDueDay());
         values.put(ExpenseManagerContract.CreditCardTable.COLUMN_NAME_BACKGROUND.getName(), creditCard.getCreditCardBackground().getCode());
+        return values;
+    }
+
+    private ContentValues getValuesFromAccount(Account account) {
+        ContentValues values = new ContentValues();
+        values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_NICK_NAME.getName(), account.getNickName());
+        values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_BANK_NAME.getName(), account.getBankName());
+        values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_NUMBER.getName(), account.getAccNumber());
+        values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_CURRENCY.getName(), account.getCurrency().getCode());
+        values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_TYPE.getName(), account.getAccountType().getCode());
+        values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE_UPDATE.getName(), account.getBalanceUpdated().getTimeInMillis());
+        //values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_CLOSING_DAY.getName(), account.getClosingDay());
+        //values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_DUE_DAY.getName(), account.getDueDay());
+        //values.put(ExpenseManagerContract.AccountTable.COLUMN_NAME_BACKGROUND.getName(), account.getCreditCardBackground().getCode());
         return values;
     }
 
@@ -630,6 +856,26 @@ public class ExpenseManagerDAO {
         return new CreditCard(id, cardAlias, bankName, cardNumber, currency, cardType, cardExpiration, closingDay, dueDay, creditCardBackground);
     }
 
+    private Account getAccountFromCursor(Cursor cursor) {
+        int id = cursor.getInt(cursor.getColumnIndex(ExpenseManagerContract.AccountTable._ID));
+        String cardAlias = cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.AccountTable.COLUMN_NAME_NICK_NAME.getName()));
+        String bankName = cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.AccountTable.COLUMN_NAME_BANK_NAME.getName()));
+        String cardNumber = cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_NUMBER.getName()));
+        Currency currency = Currency.valueOf(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.AccountTable.COLUMN_NAME_CURRENCY.getName())));
+        AccountType cardType = AccountType.valueOf(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_TYPE.getName())));
+        //int closingDay = cursor.getInt(cursor.getColumnIndex(ExpenseManagerContract.CreditCardTable.COLUMN_NAME_CLOSING_DAY.getName()));
+        //int dueDay = cursor.getInt(cursor.getColumnIndex(ExpenseManagerContract.CreditCardTable.COLUMN_NAME_DUE_DAY.getName()));
+        //CreditCardBackground creditCardBackground = CreditCardBackground.valueOf(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.CreditCardTable.COLUMN_NAME_BACKGROUND.getName())));
+
+
+        Calendar cardExpiration = null;
+        if(!cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE_UPDATE.getName())).isEmpty()) {
+            cardExpiration = Calendar.getInstance();
+            cardExpiration.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE_UPDATE.getName())));
+        }
+
+        return new Account(id, cardAlias, bankName, cardNumber, currency, cardType, cardExpiration);
+    }
 
     private CreditPeriod getCreditPeriodFromCursor(Cursor cursor) {
         int id = cursor.getInt(cursor.getColumnIndex(ExpenseManagerContract.CreditPeriodTable._ID));
@@ -660,6 +906,32 @@ public class ExpenseManagerDAO {
         return new Expense(id, description, image, fullImagePath, amount, currency, date, expenseCategory, expenseType);
     }
 
+    private Transaction getTransactionFromCursor(Cursor cursor) {
+
+        int id = cursor.getInt(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable._ID));
+        String description = cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable.COLUMN_NAME_DESCRIPTION.getName()));
+        byte[] image = cursor.getBlob(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable.COLUMN_NAME_THUMBNAIL.getName()));
+        String fullImagePath = cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable.COLUMN_NAME_FULL_IMAGE_PATH.getName()));
+        BigDecimal amount = new BigDecimal(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable.COLUMN_NAME_AMOUNT.getName())));
+        Currency currency = Currency.valueOf(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable.COLUMN_NAME_CURRENCY.getName())));
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable.COLUMN_NAME_DATE.getName())));
+        TransactionCategory expenseCategory = getTransactionCategory(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_CATEGORY.getName())));
+        TransactionType expenseType = TransactionType.valueOf(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_TYPE.getName())));
+
+        return new Transaction(id, description, image, fullImagePath, amount, currency, date, expenseCategory, expenseType);
+    }
+
+
+
+    private TransactionCategory getTransactionCategoryFromCursor(Cursor cursor) {
+
+        int id = cursor.getInt(cursor.getColumnIndex(ExpenseManagerContract.TransactionCategoryTable._ID));
+        String description = cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_DESCRIPTION.getName()));
+        TransactionType expenseType = TransactionType.valueOf(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRASACTION_TYPE.getName())));
+
+        return new TransactionCategory(id, description,expenseType);
+    }
 
     private Payment getPaymentFromCursor(Cursor cursor) {
 

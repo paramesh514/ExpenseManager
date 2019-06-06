@@ -16,6 +16,7 @@ import ve.com.abicelis.creditcardexpensemanager.app.activities.AppPreferenceActi
 import ve.com.abicelis.creditcardexpensemanager.app.activities.OcrCreateExpenseActivity;
 import ve.com.abicelis.creditcardexpensemanager.app.fragments.AboutFragment;
 import ve.com.abicelis.creditcardexpensemanager.app.fragments.AppPreferenceFragment;
+import ve.com.abicelis.creditcardexpensemanager.app.fragments.BudgetListFragment;
 import ve.com.abicelis.creditcardexpensemanager.app.fragments.CreditCardListFragment;
 import ve.com.abicelis.creditcardexpensemanager.app.fragments.ChartsFragment;
 import ve.com.abicelis.creditcardexpensemanager.app.fragments.NavigationDrawerFragment;
@@ -77,13 +78,16 @@ public class NavigationDrawerViewHolder extends RecyclerView.ViewHolder implemen
                         f = new ChartsFragment();
                         break;
                     case 3:
-                        f = new CreditCardListFragment();
+                        f = new BudgetListFragment();
                         break;
                     case 4:
+                        f = new CreditCardListFragment();
+                        break;
+                    case 5:
                         Intent intent = new Intent(fragment.getActivity(), AppPreferenceActivity.class);
                         fragment.getActivity().startActivity(intent);
                         break;
-                    case 5:
+                    case 6:
                         f = new AboutFragment();
                         break;
                     default:

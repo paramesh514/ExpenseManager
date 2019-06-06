@@ -18,7 +18,7 @@
     <string name="fragment_name_credit_cards">Accounts</string>
     <string name="fragment_name_about">About</string>
     <string name="fragment_name_preferences">Settings</string>
-
+    <string name="fragment_name_budget">Budget</string>
     /*Welcome Activity*/
     <string name="activity_welcome_txt_title">Welcome to CC Manager</string>
     <string name="activity_welcome_txt_subtitle">To get started, add a new Credit Card</string>
@@ -45,7 +45,7 @@
 
 
     /*Add new Credit Card Activity *
-    <string name="activity_add_new_cc_title">Add a Credit Card</string>
+    <string name="activity_add_new_cc_title">Add a Account</string>
     <string name="activity_add_new_cc_alias">Nick Name</string>
     <string name="activity_add_new_cc_bank">Bank Name</string>
     <string name="activity_add_new_cc_number">Card Number</string>

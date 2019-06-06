@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,26 +20,23 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
-
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 import ve.com.abicelis.creditcardexpensemanager.R;
-import ve.com.abicelis.creditcardexpensemanager.app.adapters.SelectableCreditCardAdapter;
 import ve.com.abicelis.creditcardexpensemanager.app.holders.SelectableCreditCardViewHolder;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.Constants;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.SharedPreferencesUtils;
 import ve.com.abicelis.creditcardexpensemanager.database.ExpenseManagerDAO;
+import ve.com.abicelis.creditcardexpensemanager.enums.AccountType;
 import ve.com.abicelis.creditcardexpensemanager.enums.CreditCardBackground;
 import ve.com.abicelis.creditcardexpensemanager.enums.CreditCardType;
 import ve.com.abicelis.creditcardexpensemanager.enums.Currency;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotInsertDataException;
+import ve.com.abicelis.creditcardexpensemanager.model.Account;
 import ve.com.abicelis.creditcardexpensemanager.model.CreditCard;
 
 /**
@@ -56,9 +52,9 @@ public class AddAccountActivity extends AppCompatActivity {
 
     //DATA
     boolean mCameFromWelcomeScreen = false;
-    Calendar cardExpirationCal = null;
+    //Calendar cardExpirationCal = null;
     List<Currency> currencies;
-    List<CreditCardType> cardTypes;
+    List<AccountType> accountTypes;
     List<Integer> days;
     List<CreditCard> mCreditCardList;
     CreditCardBackground selectedCreditCardBackground = null;
@@ -169,8 +165,8 @@ public class AddAccountActivity extends AppCompatActivity {
         currencyAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         cardCurrency.setAdapter(currencyAdapter);
 
-        cardTypes = new ArrayList<>(Arrays.asList(CreditCardType.values()));
-        ArrayAdapter cardTypeAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, cardTypes);
+        accountTypes = new ArrayList<>(Arrays.asList(AccountType.values()));
+        ArrayAdapter cardTypeAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, accountTypes);
         cardTypeAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         cardType.setAdapter(cardTypeAdapter);
 
@@ -215,7 +211,7 @@ public class AddAccountActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
                 for (CreditCard c : mCreditCardList) {
-                    c.setBankName(AccountBankName.getText().toString());
+                    //c.setBankName(AccountBankName.getText().toString());
                 }
             }
         });
@@ -230,7 +226,7 @@ public class AddAccountActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
                 for (CreditCard c : mCreditCardList) {
-                    c.setCardAlias(AccountNickName.getText().toString());
+                    //c.setCardAlias(AccountNickName.getText().toString());
                 }
             }
         });
@@ -245,7 +241,7 @@ public class AddAccountActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
                 for (CreditCard c : mCreditCardList) {
-                    c.setCardNumber(AccountNumber.getText().toString());
+                    //c.setCardNumber(AccountNumber.getText().toString());
                 }
             }
         });
@@ -256,7 +252,7 @@ public class AddAccountActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 for (CreditCard c : mCreditCardList) {
-                    c.setCurrency(currencies.get(cardCurrency.getSelectedItemPosition()));
+                    //c.setCurrency(currencies.get(cardCurrency.getSelectedItemPosition()));
                 }
             }
 
@@ -268,7 +264,7 @@ public class AddAccountActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 for (CreditCard c : mCreditCardList) {
-                    c.setCardType(cardTypes.get(cardType.getSelectedItemPosition()));
+                    //c.setCardType(accountTypes.get(cardType.getSelectedItemPosition()));
                 }
             }
 
@@ -293,10 +289,10 @@ public class AddAccountActivity extends AppCompatActivity {
             return;
         }
 
-        if(cardExpirationCal == null) {
-            Toast.makeText(this, getResources().getString(R.string.activity_add_new_cc_error_bad_expiration), Toast.LENGTH_SHORT).show();
-            return;
-        }
+      //  if(cardExpirationCal == null) {
+      //      Toast.makeText(this, getResources().getString(R.string.activity_add_new_cc_error_bad_expiration), Toast.LENGTH_SHORT).show();
+       //     return;
+       // }
 
 
         String bankName = AccountBankName.getText().toString();
@@ -305,17 +301,17 @@ public class AddAccountActivity extends AppCompatActivity {
         firstCreditPeriodLimit = firstCreditPeriodLimit.setScale(2, BigDecimal.ROUND_DOWN);
 
         Currency currency = currencies.get(cardCurrency.getSelectedItemPosition());
-        CreditCardType type = cardTypes.get(cardType.getSelectedItemPosition());
+        AccountType type = accountTypes.get(cardType.getSelectedItemPosition());
 
 
         ExpenseManagerDAO dao = new ExpenseManagerDAO(this);
-       // try {
-            //int creditCardId = (int) dao.insertCreditCard(new CreditCard(alias, bankName, number, currency, type, cardExpirationCal, closing, due, selectedCreditCardBackground), firstCreditPeriodLimit);
-            //SharedPreferencesUtils.setInt(getApplicationContext(), Constants.ACTIVE_CC_ID,  creditCardId);
+        try {
+            int creditCardId = (int) dao.insertAccount(new Account(alias, bankName, number, currency, type, Calendar.getInstance()));
+            SharedPreferencesUtils.setInt(getApplicationContext(), Constants.ACTIVE_CC_ID,  creditCardId);
 
-       // }catch(CouldNotInsertDataException e) {
-         //   Toast.makeText(this, "There was a problem inserting the credit card!", Toast.LENGTH_SHORT).show();
-        //}
+        }catch(CouldNotInsertDataException e) {
+            Toast.makeText(this, "There was a problem inserting the credit card!", Toast.LENGTH_SHORT).show();
+        }
         Intent goHomeIntent = new Intent(this, HomeActivity.class);
         startActivity(goHomeIntent);
         finish();

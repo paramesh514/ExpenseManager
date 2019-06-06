@@ -1,8 +1,5 @@
 package ve.com.abicelis.creditcardexpensemanager.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ve.com.abicelis.creditcardexpensemanager.enums.TransactionType;
 
 /**
@@ -10,17 +7,18 @@ import ve.com.abicelis.creditcardexpensemanager.enums.TransactionType;
  */
 public class TransactionCategory {
 
-    private int mIndex;
+    private int mId;
     private String mFriendlyName;
     private TransactionType type;
     private int mColor;
     private float budget;
 
-    TransactionCategory(int index, String friendlyName, int color) {
+    public TransactionCategory(int index, String friendlyName,TransactionType type) {
 
-        mIndex = index;
+        mId = index;
         mFriendlyName = friendlyName;
-        mColor = color;
+        this.type = type;
+        mColor = 0;
     }
 
     public int getColor() {
@@ -36,8 +34,13 @@ public class TransactionCategory {
         return mFriendlyName;
     }
 
-    public int getIndex() {
-       return mIndex;
+    public int getId() {
+       return mId;
+    }
+
+    public static TransactionCategory getDefault()
+    {
+        return new TransactionCategory(0,"Uncatgorized",TransactionType.CORRECTION);
     }
 
 }

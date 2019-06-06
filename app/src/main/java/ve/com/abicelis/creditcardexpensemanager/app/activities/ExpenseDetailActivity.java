@@ -234,7 +234,6 @@ public class ExpenseDetailActivity extends AppCompatActivity implements  View.On
         FragmentManager fm = getSupportFragmentManager();
         CreateOrEditExpenseDialogFragment dialog = CreateOrEditExpenseDialogFragment.newInstance(
                 new ExpenseManagerDAO(ExpenseDetailActivity.this),
-                mCreditPeriodId,
                 mExpense.getCurrency(),
                 mExpense);
 

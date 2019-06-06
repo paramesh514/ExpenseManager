@@ -37,6 +37,7 @@ import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotDeleteDataExc
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditCardNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditPeriodNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.SharedPreferenceNotFoundException;
+import ve.com.abicelis.creditcardexpensemanager.model.Account;
 import ve.com.abicelis.creditcardexpensemanager.model.CreditCard;
 import ve.com.abicelis.creditcardexpensemanager.model.Expense;
 
@@ -47,7 +48,7 @@ public class ExpenseListFragment extends Fragment {
 
     //Data
     int activeCreditCardId = -1;
-    CreditCard activeCreditCard = null;
+    Account activeCreditCard = null;
     List<Expense> creditCardExpenses = new ArrayList<>();
     ExpenseManagerDAO mDao;
 
@@ -194,7 +195,7 @@ public class ExpenseListFragment extends Fragment {
             }
         };
         mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-        mAdapter = new ExpensesAdapter(this, creditCardExpenses, activeCreditCard.getCreditPeriods().get(0).getId(), listener);
+        //mAdapter = new ExpensesAdapter(this, creditCardExpenses, activeCreditCard.getCreditPeriods().get(0).getId(), listener);
 
         DividerItemDecoration itemDecoration = new DividerItemDecoration(recyclerViewExpenses.getContext(), mLayoutManager.getOrientation());
         itemDecoration.setDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.item_decoration_half_line));
@@ -259,7 +260,7 @@ public class ExpenseListFragment extends Fragment {
             public void onClick(View view) {
                 fabMenu.close(true);
                 Intent intent = new Intent(getActivity(), OcrCreateExpenseActivity.class);
-                intent.putExtra(OcrCreateExpenseActivity.TAG_EXTRA_PERIOD_ID, activeCreditCard.getCreditPeriods().get(0).getId());
+      //          intent.putExtra(OcrCreateExpenseActivity.TAG_EXTRA_PERIOD_ID, activeCreditCard.getCreditPeriods().get(0).getId());
                 intent.putExtra(OcrCreateExpenseActivity.TAG_EXTRA_CURRENCY, activeCreditCard.getCurrency());
                 startActivity(intent);
             }
@@ -269,13 +270,13 @@ public class ExpenseListFragment extends Fragment {
 
 
     public void refreshData() throws CreditCardNotFoundException, CreditPeriodNotFoundException {
-        activeCreditCard = mDao.getCreditCardWithCreditPeriod(activeCreditCardId, 0);
+        //activeCreditCard = mDao.getCreditCardWithCreditPeriod(activeCreditCardId, 0);
 
         //Clear the list and refresh it with new data, this must be done so the mAdapter
         // doesn't lose track of creditCardExpenses object when overwriting
         // activeCreditCard.getCreditPeriods().get(0).getExpenses();
-        creditCardExpenses.clear();
-        creditCardExpenses.addAll(activeCreditCard.getCreditPeriods().get(0).getExpenses());
+        //creditCardExpenses.clear();
+        //creditCardExpenses.addAll(activeCreditCard.getCreditPeriods().get(0).getExpenses());
 
     }
 
@@ -303,7 +304,7 @@ public class ExpenseListFragment extends Fragment {
             //If a new expense was added
             if(newExpensesCount == oldExpensesCount+1) {
                 mAdapter.notifyItemInserted(0);
-                mAdapter.notifyItemRangeChanged(1, activeCreditCard.getCreditPeriods().get(0).getExpenses().size()-1);
+          //      mAdapter.notifyItemRangeChanged(1, activeCreditCard.getCreditPeriods().get(0).getExpenses().size()-1);
                 mLayoutManager.scrollToPosition(0);
             } else {
                 mAdapter.notifyDataSetChanged();
@@ -325,7 +326,6 @@ public class ExpenseListFragment extends Fragment {
         FragmentManager fm = getFragmentManager();
         CreateOrEditExpenseDialogFragment dialog = CreateOrEditExpenseDialogFragment.newInstance(
                 mDao,
-                activeCreditCard.getCreditPeriods().get(0).getId(),
                 activeCreditCard.getCurrency(),
                 null);
 
