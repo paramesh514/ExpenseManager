@@ -30,6 +30,7 @@ import ve.com.abicelis.creditcardexpensemanager.R;
 import ve.com.abicelis.creditcardexpensemanager.app.holders.SelectableCreditCardViewHolder;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.Constants;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.SharedPreferencesUtils;
+import ve.com.abicelis.creditcardexpensemanager.database.ExpenseManagerContract;
 import ve.com.abicelis.creditcardexpensemanager.database.ExpenseManagerDAO;
 import ve.com.abicelis.creditcardexpensemanager.enums.AccountType;
 import ve.com.abicelis.creditcardexpensemanager.enums.CreditCardBackground;
@@ -166,6 +167,8 @@ public class AddAccountActivity extends AppCompatActivity {
         cardCurrency.setAdapter(currencyAdapter);
 
         accountTypes = new ArrayList<>(Arrays.asList(AccountType.values()));
+        accountTypes.remove(AccountType.Cash);
+        accountTypes.remove(AccountType.Merchant);
         ArrayAdapter cardTypeAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, accountTypes);
         cardTypeAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         cardType.setAdapter(cardTypeAdapter);
@@ -297,16 +300,16 @@ public class AddAccountActivity extends AppCompatActivity {
 
         String bankName = AccountBankName.getText().toString();
         String number = AccountNumber.getText().toString();
-        BigDecimal firstCreditPeriodLimit = new BigDecimal(AccountBalance.getText().toString());
-        firstCreditPeriodLimit = firstCreditPeriodLimit.setScale(2, BigDecimal.ROUND_DOWN);
-
+       // BigDecimal firstCreditPeriodLimit = new BigDecimal(AccountBalance.getText().toString());
+        //firstCreditPeriodLimit = firstCreditPeriodLimit.setScale(2, BigDecimal.ROUND_DOWN);
+        float balance = Float.valueOf(AccountBalance.getText().toString());
         Currency currency = currencies.get(cardCurrency.getSelectedItemPosition());
         AccountType type = accountTypes.get(cardType.getSelectedItemPosition());
 
 
         ExpenseManagerDAO dao = new ExpenseManagerDAO(this);
         try {
-            int creditCardId = (int) dao.insertAccount(new Account(alias, bankName, number, currency, type, Calendar.getInstance()));
+            int creditCardId = (int) dao.insertAccount(new Account(alias, bankName, number,balance, currency, type, Calendar.getInstance()));
             SharedPreferencesUtils.setInt(getApplicationContext(), Constants.ACTIVE_CC_ID,  creditCardId);
 
         }catch(CouldNotInsertDataException e) {

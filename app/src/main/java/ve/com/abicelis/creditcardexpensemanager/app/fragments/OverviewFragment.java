@@ -200,7 +200,7 @@ int expensesTotal = 100;
             for(int i = 0; i < ExpenseCategory.values().length; i++) {
                 if(expensesByCategory.get(i).compareTo(maxCategory) == 1) {  //If current larger than max
                     maxCategory = expensesByCategory.get(i);
-                    maxCategoryName = ExpenseCategory.getByExpenseCategoryId(i).getFriendlyName();
+                    maxCategoryName = ExpenseCategory.getByExpenseCategoryId(i).getName();
                 }
             }
 

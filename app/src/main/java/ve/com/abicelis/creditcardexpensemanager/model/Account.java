@@ -26,7 +26,7 @@ public class Account implements Serializable {
     private String nickName;
     private String bankName;
     private String accNumber;
-    private float balance;
+    private double balance;
     private Currency currency;
     private AccountType accountType;
     private Calendar balanceUpdated;
@@ -39,13 +39,13 @@ public class Account implements Serializable {
 
    // private Map<Integer, CreditPeriod> creditPeriods;
 
-    public Account(String nickName, String bankName, String accNumber, @NonNull Currency currency, @NonNull AccountType accountType, @NonNull Calendar balanceUpdated) {
+    public Account(String nickName, String bankName, String accNumber, double balance,@NonNull Currency currency, @NonNull AccountType accountType, @NonNull Calendar balanceUpdated) {
         this.nickName = nickName;
         this.bankName = bankName;
         this.accNumber = accNumber;
         this.currency = currency;
         this.accountType = accountType;
-
+        this.balance = balance;
         this.balanceUpdated = Calendar.getInstance();
         this.balanceUpdated.setTimeZone(balanceUpdated.getTimeZone());
         this.balanceUpdated.setTimeInMillis(balanceUpdated.getTimeInMillis());
@@ -55,13 +55,13 @@ public class Account implements Serializable {
         //this.creditCardBackground = creditCardBackground;
     }
 
-    public Account(int id, String nickName, String bankName, String accNumber, @NonNull Currency currency, @NonNull AccountType accountType, @NonNull Calendar balanceUpdated) {
-        this(nickName, bankName, accNumber, currency, accountType, balanceUpdated);
+    public Account(int id, String nickName, String bankName, String accNumber,double balance, @NonNull Currency currency, @NonNull AccountType accountType, @NonNull Calendar balanceUpdated) {
+        this(nickName, bankName, accNumber, balance,currency, accountType, balanceUpdated);
         this.id = id;
     }
 
-    public Account(int id, String nickName, String bankName, String accNumber, @NonNull Currency currency, @NonNull AccountType accountType, @NonNull Calendar balanceUpdated, List<Account> linkedAccounts) {
-        this(id, nickName, bankName, accNumber, currency, accountType, balanceUpdated);
+    public Account(int id, String nickName, String bankName, String accNumber,double balance, @NonNull Currency currency, @NonNull AccountType accountType, @NonNull Calendar balanceUpdated, List<Account> linkedAccounts) {
+        this(id, nickName, bankName, accNumber,balance, currency, accountType, balanceUpdated);
         this.linkedCards = linkedAccounts;
     }
 
@@ -136,11 +136,11 @@ public class Account implements Serializable {
         this.balanceUpdated.setTimeInMillis(balanceUpdated.getTimeInMillis());
     }
 
-    public float getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(float balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 

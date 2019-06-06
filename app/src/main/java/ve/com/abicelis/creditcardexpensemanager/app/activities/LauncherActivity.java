@@ -43,7 +43,7 @@ public class LauncherActivity extends Activity {
                 SharedPreferencesUtils.setInt(getApplicationContext(), Constants.ACTIVE_CC_ID,  mDao.getAccountList().get(0).getId());
             } else {
                 //There are no credit cards in the system, send to welcomeActivity
-                Account cashAcc = new Account("Cash","CashSpend","0", Currency.INR, AccountType.Cash, Calendar.getInstance());
+                Account cashAcc = new Account("Cash","Cash","",0, Currency.INR, AccountType.Cash, Calendar.getInstance());
                 try {
                     SharedPreferencesUtils.setInt(getApplicationContext(), Constants.ACTIVE_CC_ID, (int)mDao.insertAccount(cashAcc));
                 }

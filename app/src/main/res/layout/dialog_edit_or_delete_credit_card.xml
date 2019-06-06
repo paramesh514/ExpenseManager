@@ -28,6 +28,36 @@
                 android:layout_marginBottom="20dp"
                 android:text="@string/dialog_edit_delete_cc_title"/>
 
+            <TextView
+                android:id="@+id/dialog_edit_delete_cc_label_alias"
+                android:text="@string/dialog_edit_delete_cc_label_alias"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/dialog_edit_delete_acc_nick_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:text=""
+                android:imeOptions="actionDone"
+                android:backgroundTint="@color/gray_700"
+                />
+
+            <TextView
+                android:id="@+id/dialog_edit_delete_cc_label_credit_limit"
+                android:text="@string/dialog_edit_delete_cc_label_credit_limit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/dialog_edit_delete_acc_balance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/gray_700"
+                android:imeOptions="actionDone"
+                android:inputType="numberDecimal"
+                android:text="" />
 
 
             <TextView
@@ -37,7 +67,7 @@
                 android:layout_height="wrap_content" />
 
             <EditText
-                android:id="@+id/dialog_edit_delete_cc_bank_name"
+                android:id="@+id/dialog_edit_delete_acc_bank_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="text"
@@ -46,22 +76,6 @@
                 android:backgroundTint="@color/gray_700"
                 />
 
-
-            <TextView
-                android:id="@+id/dialog_edit_delete_cc_label_alias"
-                android:text="@string/dialog_edit_delete_cc_label_alias"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <EditText
-                android:id="@+id/dialog_edit_delete_cc_alias"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:text=""
-                android:imeOptions="actionDone"
-                android:backgroundTint="@color/gray_700"
-                />
 
 
             <TextView
@@ -71,48 +85,14 @@
                 android:layout_height="wrap_content" />
 
             <EditText
-                android:id="@+id/dialog_edit_delete_cc_card_number"
+                android:id="@+id/dialog_edit_delete_acc_number"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"
-                android:text=""
-                android:imeOptions="actionDone"
                 android:backgroundTint="@color/gray_700"
-                />
-
-
-            <TextView
-                android:id="@+id/dialog_edit_delete_cc_label_credit_limit"
-                android:text="@string/dialog_edit_delete_cc_label_credit_limit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <EditText
-                android:id="@+id/dialog_edit_delete_cc_credit_limit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:text=""
                 android:imeOptions="actionDone"
-                android:backgroundTint="@color/gray_700"
-                />
+                android:inputType="number"
+                android:text="" />
 
-
-            <TextView
-                android:id="@+id/dialog_edit_delete_cc_label_card_expiration"
-                android:text="@string/dialog_edit_delete_cc_label_card_expiration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <EditText
-                android:id="@+id/dialog_edit_delete_cc_card_expiration"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:text=""
-                android:imeOptions="actionDone"
-                android:backgroundTint="@color/gray_700"
-                />
 
 
 

@@ -12,7 +12,7 @@
         android:layout_height="180dp">
 
         <ImageView
-            android:id="@+id/expense_detail_image"
+            android:id="@+id/category_detail_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/icon_expense"
@@ -20,7 +20,7 @@
             android:transitionName="@string/transition_name_expense_detail_image"/>
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/expense_detail_toolbar"
+            android:id="@+id/category_detail_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:theme="@style/ToolbarTheme"
@@ -43,78 +43,28 @@
             android:paddingBottom="12dp"
             android:paddingLeft="24dp"
             android:paddingRight="24dp">
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/activity_category_detail_label_budget" />
+                android:text="Category Name" />
             <TextView
-                android:id="@+id/expense_detail_amount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:textSize="28sp"
-                android:text="Budget"/>
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/gray_600"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/gray_600"/>
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/activity_expense_detail_label_description" />
-            <TextView
-                android:id="@+id/expense_detail_description"
+                android:id="@+id/category_detail_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:textSize="18sp"
-                android:text="This is a description"/>
+                android:text="Category Name"/>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/gray_600"/>
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/activity_expense_detail_label_category" />
-            <TextView
-                android:id="@+id/expense_detail_category"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:paddingRight="8dp"
-                android:paddingLeft="8dp"
-                android:layout_marginTop="6dp"
-                android:layout_marginLeft="20dp"
-                android:textColor="@android:color/white"
-                android:background="@drawable/shape_round_corner"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="Category" />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="6dp"
-                android:background="@color/gray_600"/>
-
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Transaction Type" />
             <TextView
-                android:id="@+id/expense_detail_type"
+                android:id="@+id/category_detail_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="2dp"
@@ -127,7 +77,29 @@
                 android:background="@drawable/shape_round_corner"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Type" />
+                android:text="Transaction Type" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray_600"/>
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Budget" />
+            <TextView
+                android:id="@+id/category_detail_budget"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:textSize="28sp"
+                android:text="Budget"/>
+
+
+
+
+
 
 
 

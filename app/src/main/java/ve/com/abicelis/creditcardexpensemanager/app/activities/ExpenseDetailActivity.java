@@ -85,7 +85,7 @@ public class ExpenseDetailActivity extends AppCompatActivity implements  View.On
         mImage = (ImageView) findViewById(R.id.expense_detail_image);
         mAmount = (TextView) findViewById(R.id.expense_detail_amount);
         mDescription = (TextView) findViewById(R.id.expense_detail_description);
-        mDate = (TextView) findViewById(R.id.expense_detail_date);
+        //mDate = (TextView) findViewById(R.id.expense_detail_date);
         mCategory = (TextView) findViewById(R.id.expense_detail_category);
         mType = (TextView) findViewById(R.id.expense_detail_type);
         //mEdit = (Button) findViewById(R.id.expense_detail_btn_edit);

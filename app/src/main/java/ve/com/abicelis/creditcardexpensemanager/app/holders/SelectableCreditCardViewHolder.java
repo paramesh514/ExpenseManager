@@ -25,29 +25,29 @@ public class SelectableCreditCardViewHolder extends RecyclerView.ViewHolder impl
     //UI
     private RelativeLayout container;
     private TextView bankName;
-    private TextView alias;
-    private TextView currency;
-    private TextView cardNumber;
-    private TextView creditCardLabel;
-    private TextView cardExpirationLabel;
+    private TextView nickName;
+    private TextView balance;
+    private TextView accNumber;
+//    private TextView //creditCardLabel;
+ //   private TextView cardExpirationLabel;
     private TextView cardExpiration;
     private ImageView cardType;
-    private ImageView cardChip;
+//    private ImageView cardChip;
 
 
     public SelectableCreditCardViewHolder(View itemView) {
         super(itemView);
 
         container = (RelativeLayout) itemView.findViewById(R.id.list_item_credit_card_container);
-        bankName = (TextView) itemView.findViewById(R.id.list_item_credit_card_bank_name);
-        alias = (TextView) itemView.findViewById(R.id.list_item_credit_card_alias);
-        currency = (TextView) itemView.findViewById(R.id.list_item_credit_card_currency);
-        cardNumber = (TextView) itemView.findViewById(R.id.list_item_credit_card_number);
-        creditCardLabel = (TextView) itemView.findViewById(R.id.list_item_credit_card_label);
-        cardExpirationLabel = (TextView) itemView.findViewById(R.id.list_item_credit_card_expiration_label);
-        cardExpiration = (TextView) itemView.findViewById(R.id.list_item_credit_card_expiration);
+        bankName = (TextView) itemView.findViewById(R.id.list_item_account_type);
+        nickName = (TextView) itemView.findViewById(R.id.list_item_acc_nick_name);
+        balance = (TextView) itemView.findViewById(R.id.list_item_balance);
+        accNumber = (TextView) itemView.findViewById(R.id.list_item_account_number);
+        //creditCardLabel = (TextView) itemView.findViewById(R.id.list_item_credit_card_label);
+        //cardExpirationLabel = (TextView) itemView.findViewById(R.id.list_item_credit_card_expiration_label);
+        cardExpiration = (TextView) itemView.findViewById(R.id.list_item_balance_update_date);
         cardType = (ImageView) itemView.findViewById(R.id.list_item_credit_card_type);
-        cardChip = (ImageView) itemView.findViewById(R.id.list_item_credit_card_chip);
+        //cardChip = (ImageView) itemView.findViewById(R.id.list_item_credit_card_chip);
 
         //LAYOUT_DETAILED views
 
@@ -61,34 +61,20 @@ public class SelectableCreditCardViewHolder extends RecyclerView.ViewHolder impl
         mPosition = position;
 
         bankName.setText(current.getBankName());
-        alias.setText(current.getCardAlias());
-        cardNumber.setText(current.getCardNumber());
-        currency.setText(current.getCurrency().getCode());
+        nickName.setText(current.getCardAlias());
+        accNumber.setText(current.getCardNumber());
+        balance.setText(current.getCurrency().getCode());
         cardExpiration.setText(current.getShortCardExpirationString());
 
         container.setBackground(current.getCreditCardBackground().getBackgroundDrawable(context));
         bankName.setTextColor(current.getCreditCardBackground().getTextColor(context));
-        alias.setTextColor(current.getCreditCardBackground().getTextColor(context));
-        currency.setTextColor(current.getCreditCardBackground().getTextColor(context));
-        cardNumber.setTextColor(current.getCreditCardBackground().getTextColor(context));
+        nickName.setTextColor(current.getCreditCardBackground().getTextColor(context));
+        balance.setTextColor(current.getCreditCardBackground().getTextColor(context));
+        accNumber.setTextColor(current.getCreditCardBackground().getTextColor(context));
         cardExpiration.setTextColor(current.getCreditCardBackground().getTextColor(context));
-        creditCardLabel.setTextColor(current.getCreditCardBackground().getTextColor(context));
-        cardExpirationLabel.setTextColor(current.getCreditCardBackground().getTextColor(context));
+        //creditCardLabel.setTextColor(current.getCreditCardBackground().getTextColor(context));
+        //cardExpirationLabel.setTextColor(current.getCreditCardBackground().getTextColor(context));
 
-        switch(current.getCardType()) {
-            case AMEX:
-                cardType.setImageResource(R.drawable.logo_amex);
-                break;
-            case DISCOVER:
-                cardType.setImageResource(R.drawable.logo_discover);
-                break;
-            case MASTERCARD:
-                cardType.setImageResource(R.drawable.logo_mastercard);
-                break;
-            case VISA:
-                cardType.setImageResource(R.drawable.logo_visa);
-                break;
-        }
 
 
     }

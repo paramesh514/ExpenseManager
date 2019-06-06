@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import ve.com.abicelis.creditcardexpensemanager.R;
 import ve.com.abicelis.creditcardexpensemanager.model.Account;
-import ve.com.abicelis.creditcardexpensemanager.model.CreditCard;
 
 /**
  * Created by Alex on 30/8/2016.
@@ -40,13 +39,13 @@ public class SelectableAccountViewHolder extends RecyclerView.ViewHolder impleme
         super(itemView);
 
         container = (RelativeLayout) itemView.findViewById(R.id.list_item_credit_card_container);
-        bankName = (TextView) itemView.findViewById(R.id.list_item_credit_card_bank_name);
-        alias = (TextView) itemView.findViewById(R.id.list_item_credit_card_alias);
-        currency = (TextView) itemView.findViewById(R.id.list_item_credit_card_currency);
-        cardNumber = (TextView) itemView.findViewById(R.id.list_item_credit_card_number);
+        bankName = (TextView) itemView.findViewById(R.id.list_item_account_type);
+        alias = (TextView) itemView.findViewById(R.id.list_item_acc_nick_name);
+        currency = (TextView) itemView.findViewById(R.id.list_item_balance);
+        cardNumber = (TextView) itemView.findViewById(R.id.list_item_account_number);
         creditCardLabel = (TextView) itemView.findViewById(R.id.list_item_credit_card_label);
         cardExpirationLabel = (TextView) itemView.findViewById(R.id.list_item_credit_card_expiration_label);
-        cardExpiration = (TextView) itemView.findViewById(R.id.list_item_credit_card_expiration);
+        cardExpiration = (TextView) itemView.findViewById(R.id.list_item_balance_update_date);
         cardType = (ImageView) itemView.findViewById(R.id.list_item_credit_card_type);
         cardChip = (ImageView) itemView.findViewById(R.id.list_item_credit_card_chip);
 

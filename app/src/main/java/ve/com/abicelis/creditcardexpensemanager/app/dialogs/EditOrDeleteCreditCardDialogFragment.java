@@ -18,8 +18,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +64,7 @@ public class EditOrDeleteCreditCardDialogFragment extends AppCompatDialogFragmen
     private EditText mCardNumber;
     private TextView mCreditLimitLabel;
     private EditText mCreditLimit;
-    private EditText mCardExpiration;
+   // private EditText mCardExpiration;
     private Spinner mCardCurrency;
     private Spinner mCardType;
 
@@ -130,12 +128,12 @@ public class EditOrDeleteCreditCardDialogFragment extends AppCompatDialogFragmen
         }
 
         // Get fields from view
-        mBankName = (EditText) view.findViewById(R.id.dialog_edit_delete_cc_bank_name);
-        mAlias = (EditText) view.findViewById(R.id.dialog_edit_delete_cc_alias);
-        mCardNumber = (EditText) view.findViewById(R.id.dialog_edit_delete_cc_card_number);
+        mBankName = (EditText) view.findViewById(R.id.dialog_edit_delete_acc_bank_name);
+        mAlias = (EditText) view.findViewById(R.id.dialog_edit_delete_acc_nick_name);
+        mCardNumber = (EditText) view.findViewById(R.id.dialog_edit_delete_acc_number);
         mCreditLimitLabel = (TextView) view.findViewById(R.id.dialog_edit_delete_cc_label_credit_limit);
-        mCreditLimit = (EditText) view.findViewById(R.id.dialog_edit_delete_cc_credit_limit);
-        mCardExpiration = (EditText) view.findViewById(R.id.dialog_edit_delete_cc_card_expiration);
+        mCreditLimit = (EditText) view.findViewById(R.id.dialog_edit_delete_acc_balance);
+    //    mCardExpiration = (EditText) view.findViewById(R.id.dialog_edit_delete_cc_card_expiration);
         mCardCurrency = (Spinner) view.findViewById(R.id.dialog_edit_delete_cc_currency);
         mCardType = (Spinner) view.findViewById(R.id.dialog_edit_delete_cc_card_type);
         //mRecycler = (RecyclerView) view.findViewById(R.id.dialog_edit_delete_cc_recycler);
@@ -163,7 +161,7 @@ public class EditOrDeleteCreditCardDialogFragment extends AppCompatDialogFragmen
         //SimpleDateFormat formatter = new SimpleDateFormat("yy-MM-dd", Locale.getDefault());
         cardExpirationCal.setTimeInMillis(mCreditCard.getCardExpiration().getTimeInMillis());
         //mCardExpiration.setText(formatter.format(cardExpirationCal.getTime()));
-        mCardExpiration.setText(mCreditCard.getLongCardExpirationString());
+        //mCardExpiration.setText(mAccount.getLongCardExpirationString());
 
         if(mOldCreditLimit != null)
             mCreditLimit.setText(mOldCreditLimit.toPlainString());
@@ -197,7 +195,7 @@ public class EditOrDeleteCreditCardDialogFragment extends AppCompatDialogFragmen
     }
 
     private void setupPickers() {
-        mCardExpiration.setOnClickListener(new View.OnClickListener() {
+        /*mCardExpiration.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 CalendarDatePickerDialogFragment cdp = new CalendarDatePickerDialogFragment()
@@ -205,8 +203,8 @@ public class EditOrDeleteCreditCardDialogFragment extends AppCompatDialogFragmen
                             @Override
                             public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
                                 cardExpirationCal.set(year, monthOfYear, dayOfMonth);
-                                mCreditCard.setCardExpiration(cardExpirationCal);
-                                mCardExpiration.setText(mCreditCard.getLongCardExpirationString());
+                                mAccount.setCardExpiration(cardExpirationCal);
+                                mCardExpiration.setText(mAccount.getLongCardExpirationString());
                             }
                         })
                         .setFirstDayOfWeek(Calendar.SUNDAY)
@@ -214,7 +212,7 @@ public class EditOrDeleteCreditCardDialogFragment extends AppCompatDialogFragmen
                         .setCancelText(getResources().getString(R.string.activity_add_new_cc_expiration_datepicker_button_cancel));
                 cdp.show(getFragmentManager(), "CAL_TAG");
             }
-        });
+        });*/
     }
 
 

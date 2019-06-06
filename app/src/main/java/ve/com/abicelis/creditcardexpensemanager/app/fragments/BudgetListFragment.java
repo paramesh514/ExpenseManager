@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -24,12 +25,18 @@ import java.util.List;
 import ve.com.abicelis.creditcardexpensemanager.R;
 import ve.com.abicelis.creditcardexpensemanager.app.activities.AddAccountActivity;
 import ve.com.abicelis.creditcardexpensemanager.app.adapters.AccountAdapter;
+import ve.com.abicelis.creditcardexpensemanager.app.adapters.CategoryAdapter;
+import ve.com.abicelis.creditcardexpensemanager.app.dialogs.CreateOrEditCategoryDialogFragment;
 import ve.com.abicelis.creditcardexpensemanager.app.dialogs.EditOrDeleteAccountDialogFragment;
 import ve.com.abicelis.creditcardexpensemanager.app.holders.AccountViewHolder;
+import ve.com.abicelis.creditcardexpensemanager.app.holders.CategoryViewHolder;
+import ve.com.abicelis.creditcardexpensemanager.app.holders.ExpensesViewHolder;
 import ve.com.abicelis.creditcardexpensemanager.database.ExpenseManagerDAO;
+import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotDeleteDataException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditCardNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditPeriodNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.model.Account;
+import ve.com.abicelis.creditcardexpensemanager.model.TransactionCategory;
 
 /**
  * Created by Alex on 3/9/2016.
@@ -37,13 +44,13 @@ import ve.com.abicelis.creditcardexpensemanager.model.Account;
 public class BudgetListFragment extends Fragment {
 
     //Data
-    List<Account> creditCards = new ArrayList<>();
+    List<TransactionCategory> categories = new ArrayList<>();
     ExpenseManagerDAO dao;
 
     //UI
     RecyclerView recycler;
     LinearLayoutManager layoutManager;
-    AccountAdapter adapter;
+    CategoryAdapter adapter;
     FloatingActionButton fabNewCreditCard;
     SwipeRefreshLayout swipeRefreshLayout;
 
@@ -59,13 +66,13 @@ public class BudgetListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         loadDao();
-        creditCards.addAll(dao.getAccountList());
+        categories.addAll(dao.getTransactionCategoryList());
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_credit_card_list, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_categories_list, container, false);
 
         setUpRecyclerView(rootView);
         setUpSwipeRefresh(rootView);
@@ -84,19 +91,34 @@ public class BudgetListFragment extends Fragment {
     private void setUpRecyclerView(View rootView) {
 
         recycler = (RecyclerView) rootView.findViewById(R.id.ccl_recycler);
+        CategoryViewHolder.CategoryDeletedListener listener = new CategoryViewHolder.CategoryDeletedListener() {
+            @Override
+            public void OnCategoryDeleted(int position) {
+                try {
 
+                    dao.deleteExpense(categories.get(position).getId());
+                    categories.remove(position);
+                    adapter.notifyItemRemoved(position);
+                    adapter.notifyItemRangeChanged(position, adapter.getItemCount());
+                    //refreshChart();
+                }catch (CouldNotDeleteDataException e) {
+                    Toast.makeText(getActivity(), "There was an error deleting the expense!", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        };
         layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-        recycler.addItemDecoration(new DividerItemDecoration(recycler.getContext(), layoutManager.getOrientation()));
+        adapter = new CategoryAdapter(this, categories, listener);
+
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(recycler.getContext(), layoutManager.getOrientation());
+        itemDecoration.setDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.item_decoration_half_line));
+
+
+        recycler.addItemDecoration(itemDecoration);
         recycler.setLayoutManager(layoutManager);
 
-        adapter = new AccountAdapter(getActivity(), this, creditCards);
-        adapter.setCreditCardSelectedListener(new AccountViewHolder.AccountSelectedListener() {
-            @Override
-            public void OnAccountSelected(Account creditCard) {
-                showEditOrDeleteCCDialog(creditCard);
-            }
-        });
         recycler.setAdapter(adapter);
+
 
     }
 
@@ -115,30 +137,44 @@ public class BudgetListFragment extends Fragment {
 
 
     private void setUpFab(View rootView) {
-        fabNewCreditCard = (FloatingActionButton) rootView.findViewById(R.id.ccl_fab_add_cc);
+        fabNewCreditCard = (FloatingActionButton) rootView.findViewById(R.id.ccl_fab_add_category);
 
         fabNewCreditCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent addCCIntent = new Intent(getActivity(), AddAccountActivity.class);
-                startActivity(addCCIntent);
+                showCreateExpenseDialog();
             }
         });
+    }
+    private void showCreateExpenseDialog() {
+        FragmentManager fm = getFragmentManager();
+        CreateOrEditCategoryDialogFragment dialog = CreateOrEditCategoryDialogFragment.newInstance(
+                dao,
+                null);
+
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                refreshRecyclerView();
+                //refreshChart();
+            }
+        });
+        dialog.show(fm, "fragment_dialog_create_category");
     }
 
 
     public void refreshData() throws CreditCardNotFoundException, CreditPeriodNotFoundException {
         //Clear the list and refresh it with new data, this must be done so the mAdapter
-        // doesn't lose track of creditCards list
-        creditCards.clear();
-        creditCards.addAll(dao.getAccountList());
+        // doesn't lose track of categories list
+        categories.clear();
+        categories.addAll(dao.getTransactionCategoryList());
     }
 
 
     public void refreshRecyclerView() {
         loadDao();
 
-        int oldCount = creditCards.size();
+        int oldCount = categories.size();
         try {
             refreshData();
         }catch (CreditCardNotFoundException e ) {
@@ -149,13 +185,13 @@ public class BudgetListFragment extends Fragment {
             return;
         }
 
-        int newCount = creditCards.size();
+        int newCount = categories.size();
 
 
         //If a new credit card was added
         if(newCount == oldCount+1) {
             adapter.notifyItemInserted(0);
-            adapter.notifyItemRangeChanged(1, creditCards.size()-1);
+            adapter.notifyItemRangeChanged(1, categories.size()-1);
             layoutManager.scrollToPosition(0);
         } else {
             adapter.notifyDataSetChanged();

@@ -135,7 +135,7 @@ public class CreditCardListFragment extends Fragment {
 
     public void refreshData() throws CreditCardNotFoundException, CreditPeriodNotFoundException {
         //Clear the list and refresh it with new data, this must be done so the mAdapter
-        // doesn't lose track of creditCards list
+        // doesn't lose track of categories list
         creditCards.clear();
         creditCards.addAll(dao.getAccountList());
     }

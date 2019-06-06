@@ -18,8 +18,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,16 +28,13 @@ import ve.com.abicelis.creditcardexpensemanager.R;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.NumberInputFilter;
 import ve.com.abicelis.creditcardexpensemanager.database.ExpenseManagerDAO;
 import ve.com.abicelis.creditcardexpensemanager.enums.AccountType;
-import ve.com.abicelis.creditcardexpensemanager.enums.CreditCardType;
 import ve.com.abicelis.creditcardexpensemanager.enums.Currency;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotDeleteDataException;
-import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotInsertDataException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotUpdateDataException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditCardNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditPeriodNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.model.Account;
 import ve.com.abicelis.creditcardexpensemanager.model.CreditCard;
-import ve.com.abicelis.creditcardexpensemanager.model.CreditPeriod;
 
 /**
  * Created by Alex on 9/8/2016.
@@ -54,23 +49,23 @@ public class EditOrDeleteAccountDialogFragment extends AppCompatDialogFragment i
     private ExpenseManagerDAO mDao;
 
     //DATA
-    Account mCreditCard = null;
-    BigDecimal mOldCreditLimit = null;
+    Account mAccount = null;
+    //BigDecimal mOldCreditLimit = null;
     List<Currency> currencies;
-    List<AccountType> cardTypes;
-    Calendar cardExpirationCal =  Calendar.getInstance();
+    List<AccountType> accTypes;
+    //Calendar cardExpirationCal =  Calendar.getInstance();
 
 
     //UI
     private DialogInterface.OnDismissListener mOnDismissListener;
-    private EditText mAlias;
+    private EditText mNickName;
     private EditText mBankName;
-    private EditText mCardNumber;
+    private EditText mAccNumber;
     private TextView mCreditLimitLabel;
-    private EditText mCreditLimit;
-    private EditText mCardExpiration;
-    private Spinner mCardCurrency;
-    private Spinner mCardType;
+    private EditText mAccBalance;
+    //private EditText mCardExpiration;
+    private Spinner mAccCurrency;
+    private Spinner mAccType;
 
     private Button mDeleteButton;
     private Button mCancelButton;
@@ -116,38 +111,30 @@ public class EditOrDeleteAccountDialogFragment extends AppCompatDialogFragment i
         getDialog().setTitle(R.string.dialog_edit_delete_cc_title);
 
         // Fetch arguments from bundle and set title
-        mCreditCard = (Account) getArguments().getSerializable(TAG_ARGS_CREDIT_CARD);
+        mAccount = (Account) getArguments().getSerializable(TAG_ARGS_CREDIT_CARD);
 
-        if(mCreditCard == null) {
+        if(mAccount == null) {
             Toast.makeText(getActivity(), "Error, wrong arguments passed. Dismissing dialog.", Toast.LENGTH_SHORT).show();
             dismiss();
         }
 
-        //Get oldCreditLimit from db
-        try {
-            CreditCard cc = mDao.getCreditCardWithCreditPeriod(mCreditCard.getId(), 0);
-            mOldCreditLimit = cc.getCreditPeriods().get(0).getCreditLimit();
-        }catch (CreditCardNotFoundException | CreditPeriodNotFoundException e) {
-            mOldCreditLimit = null;
-        }
-
         // Get fields from view
-        mBankName = (EditText) view.findViewById(R.id.dialog_edit_delete_cc_bank_name);
-        mAlias = (EditText) view.findViewById(R.id.dialog_edit_delete_cc_alias);
-        mCardNumber = (EditText) view.findViewById(R.id.dialog_edit_delete_cc_card_number);
+        mBankName = (EditText) view.findViewById(R.id.dialog_edit_delete_acc_bank_name);
+        mNickName = (EditText) view.findViewById(R.id.dialog_edit_delete_acc_nick_name);
+        mAccNumber = (EditText) view.findViewById(R.id.dialog_edit_delete_acc_number);
         mCreditLimitLabel = (TextView) view.findViewById(R.id.dialog_edit_delete_cc_label_credit_limit);
-        mCreditLimit = (EditText) view.findViewById(R.id.dialog_edit_delete_cc_credit_limit);
-        mCardExpiration = (EditText) view.findViewById(R.id.dialog_edit_delete_cc_card_expiration);
-        mCardCurrency = (Spinner) view.findViewById(R.id.dialog_edit_delete_cc_currency);
-        mCardType = (Spinner) view.findViewById(R.id.dialog_edit_delete_cc_card_type);
+        mAccBalance = (EditText) view.findViewById(R.id.dialog_edit_delete_acc_balance);
+///        mCardExpiration = (EditText) view.findViewById(R.id.dialog_edit_delete_cc_card_expiration);
+        mAccCurrency = (Spinner) view.findViewById(R.id.dialog_edit_delete_cc_currency);
+        mAccType = (Spinner) view.findViewById(R.id.dialog_edit_delete_cc_card_type);
         //mRecycler = (RecyclerView) view.findViewById(R.id.dialog_edit_delete_cc_recycler);
 
         mDeleteButton = (Button) view.findViewById(R.id.dialog_edit_delete_cc_button_delete);
         mCancelButton = (Button) view.findViewById(R.id.dialog_edit_delete_cc_button_cancel);
         mEditButton = (Button) view.findViewById(R.id.dialog_edit_delete_cc_button_edit);
 
-        //Limit mCreditLimit
-        mCreditLimit.setFilters(new InputFilter[]{new NumberInputFilter(9, 2)});
+        //Limit mAccBalance
+        //mAccBalance.setFilters(new InputFilter[]{new NumberInputFilter(9, 2)});
 
         setupListeners();
         setupSpinners();
@@ -155,23 +142,18 @@ public class EditOrDeleteAccountDialogFragment extends AppCompatDialogFragment i
 
 
         //Set original credit card values
-        mBankName.setText(mCreditCard.getBankName());
-        mAlias.setText(mCreditCard.getNickName());
-        mCardNumber.setText(mCreditCard.getAccNumber());
-        mCardCurrency.setSelection(currencies.indexOf(mCreditCard.getCurrency()));
-        mCardType.setSelection(cardTypes.indexOf(mCreditCard.getAccountType()));
+        mBankName.setText(mAccount.getBankName());
+        mNickName.setText(mAccount.getNickName());
+        mAccNumber.setText(mAccount.getAccNumber());
+        mAccCurrency.setSelection(currencies.indexOf(mAccount.getCurrency()));
+        mAccType.setSelection(accTypes.indexOf(mAccount.getAccountType()));
+        mAccBalance.setText(String.valueOf(mAccount.getBalance()));
 
 
         //SimpleDateFormat formatter = new SimpleDateFormat("yy-MM-dd", Locale.getDefault());
-        cardExpirationCal.setTimeInMillis(mCreditCard.getBalanceUpdated().getTimeInMillis());
+        //cardExpirationCal.setTimeInMillis(mAccount.getBalanceUpdated().getTimeInMillis());
         //mCardExpiration.setText(formatter.format(cardExpirationCal.getTime()));
-        mCardExpiration.setText(mCreditCard.getLongCardExpirationString());
-
-        if(mOldCreditLimit != null)
-            mCreditLimit.setText(mOldCreditLimit.toPlainString());
-        else
-            mCreditLimit.setText("0");
-
+        //mCardExpiration.setText(mAccount.getLongCardExpirationString());
 
         // Show soft keyboard automatically and request focus to field
         //mAmountText.requestFocus();
@@ -189,17 +171,17 @@ public class EditOrDeleteAccountDialogFragment extends AppCompatDialogFragment i
         currencies = new ArrayList<>(Arrays.asList(Currency.values()));
         ArrayAdapter currencyAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, currencies);
         currencyAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-        mCardCurrency.setAdapter(currencyAdapter);
+        mAccCurrency.setAdapter(currencyAdapter);
 
-        cardTypes = new ArrayList<>(Arrays.asList(AccountType.values()));
-        ArrayAdapter cardTypeAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, cardTypes);
+        accTypes = new ArrayList<>(Arrays.asList(AccountType.values()));
+        ArrayAdapter cardTypeAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, accTypes);
         cardTypeAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-        mCardType.setAdapter(cardTypeAdapter);
+        mAccType.setAdapter(cardTypeAdapter);
 
     }
 
     private void setupPickers() {
-        mCardExpiration.setOnClickListener(new View.OnClickListener() {
+        /*mCardExpiration.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 CalendarDatePickerDialogFragment cdp = new CalendarDatePickerDialogFragment()
@@ -207,8 +189,8 @@ public class EditOrDeleteAccountDialogFragment extends AppCompatDialogFragment i
                             @Override
                             public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
                                 cardExpirationCal.set(year, monthOfYear, dayOfMonth);
-                                mCreditCard.setBalanceUpdated(cardExpirationCal);
-                                mCardExpiration.setText(mCreditCard.getLongCardExpirationString());
+                                mAccount.setBalanceUpdated(cardExpirationCal);
+                                mCardExpiration.setText(mAccount.getLongCardExpirationString());
                             }
                         })
                         .setFirstDayOfWeek(Calendar.SUNDAY)
@@ -216,7 +198,7 @@ public class EditOrDeleteAccountDialogFragment extends AppCompatDialogFragment i
                         .setCancelText(getResources().getString(R.string.activity_add_new_cc_expiration_datepicker_button_cancel));
                 cdp.show(getFragmentManager(), "CAL_TAG");
             }
-        });
+        });*/
     }
 
 
@@ -261,7 +243,7 @@ public class EditOrDeleteAccountDialogFragment extends AppCompatDialogFragment i
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         try {
-                            mDao.deleteCreditCard(mCreditCard.getId());
+                            mDao.deleteCreditCard(mAccount.getId());
                             dismiss();
                         }catch (CouldNotDeleteDataException e) {
                             Toast.makeText(getActivity(), "Error deleting Credit Card", Toast.LENGTH_SHORT).show();
@@ -279,15 +261,16 @@ public class EditOrDeleteAccountDialogFragment extends AppCompatDialogFragment i
     }
 
     private void handleCardEdition() {
-        String alias = mAlias.getText().toString();
+        String alias = mNickName.getText().toString();
         if(alias.isEmpty()) {
             Toast.makeText(getActivity(), getResources().getString(R.string.activity_add_new_cc_error_bad_alias), Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String amount = mCreditLimit.getText().toString();
+        String amount = mAccBalance.getText().toString();
         try{
-            Double.parseDouble(amount);
+            float fAmount = Float.parseFloat(amount);
+            mAccount.setBalance(fAmount);
         }catch (NumberFormatException e) {
             amount = "";    //Force if below
         }
@@ -296,10 +279,10 @@ public class EditOrDeleteAccountDialogFragment extends AppCompatDialogFragment i
             return;
         }
 
-        if(cardExpirationCal == null) {
+        /*if(cardExpirationCal == null) {
             Toast.makeText(getActivity(), getResources().getString(R.string.activity_add_new_cc_error_bad_expiration), Toast.LENGTH_SHORT).show();
             return;
-        }
+        }*/
 
 //        int closing = days.get(cardClosingDay.getSelectedItemPosition());
 //        int due = days.get(cardDueDay.getSelectedItemPosition());
@@ -314,20 +297,20 @@ public class EditOrDeleteAccountDialogFragment extends AppCompatDialogFragment i
 //        }
 
 
-        mCreditCard.setBankName(mBankName.getText().toString());
-        mCreditCard.setNickName(alias);
-        mCreditCard.setAccNumber(mCardNumber.getText().toString());
-        mCreditCard.setBalanceUpdated(cardExpirationCal);
-        mCreditCard.setCurrency(currencies.get(mCardCurrency.getSelectedItemPosition()));
-        mCreditCard.setAccountType(cardTypes.get(mCardType.getSelectedItemPosition()));
+        mAccount.setBankName(mBankName.getText().toString());
+        mAccount.setNickName(alias);
+        mAccount.setAccNumber(mAccNumber.getText().toString());
+        mAccount.setBalanceUpdated(Calendar.getInstance());
+        mAccount.setCurrency(currencies.get(mAccCurrency.getSelectedItemPosition()));
+        mAccount.setAccountType(accTypes.get(mAccType.getSelectedItemPosition()));
 
 
         try {
-            mDao.updateAccount(mCreditCard);
+            mDao.updateAccount(mAccount);
 
             /*//Check if CreditCard has a current creditPeriod
             try {
-                CreditCard c = mDao.getCreditCardWithCreditPeriod(mCreditCard.getId(), 0);
+                CreditCard c = mDao.getCreditCardWithCreditPeriod(mAccount.getId(), 0);
                 CreditPeriod newCreditPeriod = c.getCreditPeriods().get(0);
 
                 //Get new creditLimit from dialog
@@ -336,13 +319,13 @@ public class EditOrDeleteAccountDialogFragment extends AppCompatDialogFragment i
 
                 //Set creditLimit to creditPeriod
                 newCreditPeriod.setCreditLimit(newCreditLimit);
-                mDao.updateCreditPeriod(mCreditCard.getId(), newCreditPeriod);
+                mDao.updateCreditPeriod(mAccount.getId(), newCreditPeriod);
 
             } catch (CreditCardNotFoundException | CreditPeriodNotFoundException e) {
 
                 //Credit card has no current credit period, create one.
                 try {
-                    mDao.insertCurrentCreditPeriod(mCreditCard.getId(), mCreditCard.getClosingDay(), new BigDecimal(amount));
+                    mDao.insertCurrentCreditPeriod(mAccount.getId(), mAccount.getClosingDay(), new BigDecimal(amount));
                 }catch (CouldNotInsertDataException e1) {
                     Toast.makeText(getActivity(), "Could not create Credit Period", Toast.LENGTH_SHORT).show();
                 }
