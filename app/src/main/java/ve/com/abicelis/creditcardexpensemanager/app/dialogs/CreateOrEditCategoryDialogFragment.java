@@ -385,7 +385,7 @@ public class CreateOrEditCategoryDialogFragment extends AppCompatDialogFragment 
         //If editing an expense, update it
         if(mOriginalExpense != null) {
             try {
-                TransactionCategory expense = new TransactionCategory(mOriginalExpense.getId(), description, expenseType,amt);
+                TransactionCategory expense = new TransactionCategory(mOriginalExpense.getId(), description, expenseType,amt,mOriginalExpense.getSpent());
                 mDao.updateTransactionCategory(expense);
             } catch (CouldNotUpdateDataException e) {
                 Toast.makeText(getActivity(), "There was a problem updating the Expense", Toast.LENGTH_SHORT).show();
@@ -393,7 +393,7 @@ public class CreateOrEditCategoryDialogFragment extends AppCompatDialogFragment 
         } else {
             //Otherwise, insert a new expense
             try {
-                TransactionCategory expense = new TransactionCategory(description, expenseType,amt);
+                TransactionCategory expense = new TransactionCategory(description, expenseType,amt,0.0);
                 mDao.insertTransactionCategory(expense);
             } catch (CouldNotInsertDataException e) {
                 Toast.makeText(getActivity(), "There was a problem inserting the Expense", Toast.LENGTH_SHORT).show();

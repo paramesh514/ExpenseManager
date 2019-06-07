@@ -39,7 +39,7 @@ public class LauncherActivity extends Activity {
         }catch(SharedPreferenceNotFoundException | AccountNotFoundException e) {
 
             //if there's at least one CreditCard in database, set it's id to ACTIVE_CC_ID
-            if(mDao.getCreditCardList().size() > 0) {
+            if(mDao.getAccountList().size() > 0) {
                 SharedPreferencesUtils.setInt(getApplicationContext(), Constants.ACTIVE_CC_ID,  mDao.getAccountList().get(0).getId());
             } else {
                 //There are no credit cards in the system, send to welcomeActivity

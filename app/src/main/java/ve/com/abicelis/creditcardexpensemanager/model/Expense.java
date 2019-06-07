@@ -17,7 +17,7 @@ import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseType;
 /**
  * Created by Alex on 6/8/2016.
  */
-public class Expense implements Serializable {
+/*public class Expense implements Serializable {
 
     private int id;
     private String description;
@@ -110,4 +110,4 @@ public class Expense implements Serializable {
                 " transactionCategory=" + expenseCategory + "\r\n" +
                 " transactionType=" + expenseType;
     }
-}
+}*/

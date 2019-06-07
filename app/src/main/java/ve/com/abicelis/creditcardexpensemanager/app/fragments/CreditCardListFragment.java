@@ -18,24 +18,18 @@ import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import ve.com.abicelis.creditcardexpensemanager.R;
 import ve.com.abicelis.creditcardexpensemanager.app.activities.AddAccountActivity;
 import ve.com.abicelis.creditcardexpensemanager.app.adapters.AccountAdapter;
-import ve.com.abicelis.creditcardexpensemanager.app.adapters.CreditCardAdapter;
 import ve.com.abicelis.creditcardexpensemanager.app.dialogs.EditOrDeleteAccountDialogFragment;
-import ve.com.abicelis.creditcardexpensemanager.app.dialogs.EditOrDeleteCreditCardDialogFragment;
 import ve.com.abicelis.creditcardexpensemanager.app.holders.AccountViewHolder;
-import ve.com.abicelis.creditcardexpensemanager.app.holders.CreditCardViewHolder;
-import ve.com.abicelis.creditcardexpensemanager.app.holders.ExpensesViewHolder;
 import ve.com.abicelis.creditcardexpensemanager.database.ExpenseManagerDAO;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditCardNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditPeriodNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.model.Account;
-import ve.com.abicelis.creditcardexpensemanager.model.CreditCard;
 
 /**
  * Created by Alex on 3/9/2016.

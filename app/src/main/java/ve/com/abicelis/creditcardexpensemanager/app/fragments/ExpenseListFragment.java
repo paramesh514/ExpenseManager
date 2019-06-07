@@ -28,7 +28,6 @@ import ve.com.abicelis.creditcardexpensemanager.R;
 import ve.com.abicelis.creditcardexpensemanager.app.activities.OcrCreateExpenseActivity;
 import ve.com.abicelis.creditcardexpensemanager.app.adapters.TransactionAdapter;
 import ve.com.abicelis.creditcardexpensemanager.app.dialogs.CreateOrEditTransactionDialogFragment;
-import ve.com.abicelis.creditcardexpensemanager.app.holders.ExpensesViewHolder;
 import ve.com.abicelis.creditcardexpensemanager.app.holders.TransactionViewHolder;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.Constants;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.SharedPreferencesUtils;

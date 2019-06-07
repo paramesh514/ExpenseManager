@@ -96,7 +96,7 @@ public class CategoryDetailActivity extends AppCompatActivity implements  View.O
 
     private void setUpToolbar() {
         setSupportActionBar(mToolbar);
-        mToolbar.setTitle(getResources().getString(R.string.activity_expense_detail_title));
+        mToolbar.setTitle("Category Details");
         mToolbar.setNavigationIcon(ContextCompat.getDrawable(this, R.drawable.icon_back_material));
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -170,7 +170,7 @@ public class CategoryDetailActivity extends AppCompatActivity implements  View.O
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         try{
-                            new ExpenseManagerDAO(CategoryDetailActivity.this).deleteExpense(transactionCategory.getId());
+                            new ExpenseManagerDAO(CategoryDetailActivity.this).deleteTransactionCategory(transactionCategory.getId());
                             setResult(Constants.RESULT_REFRESH_DATA);
                             onBackPressed();
                         } catch(CouldNotDeleteDataException e) {

@@ -14,8 +14,9 @@ public class TransactionCategory implements Serializable {
     private TransactionType type;
     private int mColor;
     private double budget;
+    private double spent;
 
-    public TransactionCategory(String friendlyName,TransactionType type,double budget) {
+    public TransactionCategory(String friendlyName,TransactionType type,double budget,double spent) {
 
         mId = 0;
         mName = friendlyName;
@@ -23,13 +24,10 @@ public class TransactionCategory implements Serializable {
         mColor = 0;
         this.budget = budget;
     }
-    public TransactionCategory(int index, String friendlyName,TransactionType type,double budget) {
-
+    public TransactionCategory(int index, String friendlyName,TransactionType type,double budget,double spent) {
+        this(friendlyName,type,budget,spent);
         mId = index;
-        mName = friendlyName;
-        this.type = type;
-        mColor = 0;
-        this.budget = budget;
+
     }
 
     public int getColor() {
@@ -51,7 +49,7 @@ public class TransactionCategory implements Serializable {
 
     public static TransactionCategory getDefault()
     {
-        return new TransactionCategory(0,"Uncatgorized",TransactionType.CORRECTION,0.0);
+        return new TransactionCategory(0,"Uncatgorized",TransactionType.CORRECTION,0.0,0.0);
     }
 
     public String getmName() {
@@ -84,5 +82,13 @@ public class TransactionCategory implements Serializable {
 
     public void setBudget(double budget) {
         this.budget = budget;
+    }
+
+    public double getSpent() {
+        return spent;
+    }
+
+    public void setSpent(double spent) {
+        this.spent = spent;
     }
 }

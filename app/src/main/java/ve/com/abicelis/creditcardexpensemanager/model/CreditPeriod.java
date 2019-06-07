@@ -26,7 +26,7 @@ public class CreditPeriod {
     private Calendar endDate;
     private BigDecimal creditLimit;
 
-    private List<Expense> expenses = new ArrayList<>();
+    private List<Transaction> expenses = new ArrayList<>();
     private List<Payment> payments = new ArrayList<>();
 
 
@@ -49,7 +49,7 @@ public class CreditPeriod {
         this.id = id;
     }
 
-    public CreditPeriod(int id, int periodNameStyle, Calendar startDate, Calendar endDate, BigDecimal creditLimit, List<Expense> expenses, List<Payment> payments) {
+    public CreditPeriod(int id, int periodNameStyle, Calendar startDate, Calendar endDate, BigDecimal creditLimit, List<Transaction> expenses, List<Payment> payments) {
         this(id, periodNameStyle, startDate, endDate, creditLimit);
 
         this.expenses = expenses;
@@ -131,11 +131,11 @@ public class CreditPeriod {
         this.creditLimit = new BigDecimal(creditLimit.toPlainString());
     }
 
-    public List<Expense> getExpenses() {
+    public List<Transaction> getExpenses() {
         return expenses;
     }
 
-    public void setExpenses(List<Expense> expenses) {
+    public void setExpenses(List<Transaction> expenses) {
         this.expenses = expenses;
     }
 
@@ -155,7 +155,7 @@ public class CreditPeriod {
     public BigDecimal getExpensesTotal() {
         BigDecimal balance = new BigDecimal(0);
 
-        for (Expense e: expenses) {
+        for (Transaction e: expenses) {
             balance = balance.add(e.getAmount());
         }
 
@@ -183,8 +183,8 @@ public class CreditPeriod {
         }
 
         //Iterate through expenses, accumulate expenses by category inside expenseByCategory list
-        for (Expense e : expenses) {
-            categoryIndex = e.getExpenseCategory().getIndex();
+        for (Transaction e : expenses) {
+            categoryIndex = e.getTransactionCategory().getId();
             BigDecimal currentVal = expenseByCategory.get(categoryIndex);
             expenseByCategory.set(categoryIndex, currentVal.add(e.amount));
         }
@@ -241,7 +241,7 @@ public class CreditPeriod {
             cal.add(Calendar.DAY_OF_MONTH, 1);
         }
 
-        for (Expense expense: expenses) {
+        for (Transaction expense: expenses) {
             int index = getDateIndex(expense.getDate());
             dailyExpenses.get(index).addToAmount(expense.getAmount());
         }

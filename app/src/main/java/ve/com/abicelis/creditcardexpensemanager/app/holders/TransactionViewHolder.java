@@ -3,10 +3,8 @@ package ve.com.abicelis.creditcardexpensemanager.app.holders;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.GradientDrawable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -16,12 +14,10 @@ import android.widget.TextView;
 
 import ve.com.abicelis.creditcardexpensemanager.R;
 import ve.com.abicelis.creditcardexpensemanager.app.activities.ExpenseDetailActivity;
-import ve.com.abicelis.creditcardexpensemanager.app.adapters.ExpensesAdapter;
 import ve.com.abicelis.creditcardexpensemanager.app.adapters.TransactionAdapter;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.Constants;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.DateUtils;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.ImageUtils;
-import ve.com.abicelis.creditcardexpensemanager.model.Expense;
 import ve.com.abicelis.creditcardexpensemanager.model.Transaction;
 
 /**
@@ -111,7 +107,7 @@ public class TransactionViewHolder extends RecyclerView.ViewHolder implements Vi
                 ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(mFragment.getActivity(), pairs);
                 Intent expenseDetailIntent = new Intent(mFragment.getActivity(), ExpenseDetailActivity.class);
                 expenseDetailIntent.putExtra(ExpenseDetailActivity.INTENT_EXTRAS_EXPENSE, mCurrent);
-                expenseDetailIntent.putExtra(ExpenseDetailActivity.INTENT_EXTRAS_CREDIT_PERIOD_ID, mCreditPeriodId);
+              //  expenseDetailIntent.putExtra(ExpenseDetailActivity.INTENT_EXTRAS_CREDIT_PERIOD_ID, mCreditPeriodId);
                 mFragment.startActivityForResult(expenseDetailIntent, Constants.EXPENSE_DETAIL_ACTIVITY_REQUEST_CODE, options.toBundle());
 
                 break;

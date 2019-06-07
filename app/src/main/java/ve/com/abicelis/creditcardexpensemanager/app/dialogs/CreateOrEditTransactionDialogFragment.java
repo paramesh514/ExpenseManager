@@ -24,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -55,7 +56,6 @@ import ve.com.abicelis.creditcardexpensemanager.enums.Currency;
 import ve.com.abicelis.creditcardexpensemanager.enums.TransactionType;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotInsertDataException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotUpdateDataException;
-import ve.com.abicelis.creditcardexpensemanager.model.Expense;
 import ve.com.abicelis.creditcardexpensemanager.model.Transaction;
 import ve.com.abicelis.creditcardexpensemanager.model.TransactionCategory;
 
@@ -69,7 +69,7 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
     private static final String TAG_ARGS_TITLE = "tagArgsTitle";
     private static final String TAG_ARGS_PERIOD_ID = "tagArgsPeriodId";
     private static final String TAG_ARGS_CURRENCY = "tagArgsCurrency";
-    private static final String TAG_ARGS_ORIGINAL_EXPENSE = "tagArgsOriginalExpense";
+    private static final String TAG_ARGS_ORIGINAL_TRANSACTION = "tagArgsOriginalExpense";
     private static final String TAG = "CreateExpenseDialogFrag";
     private static final int REQUEST_IMAGE_CAPTURE = 123;
     private static final int REQUEST_IMAGE_CROP = 124;
@@ -88,7 +88,7 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
     private ImageView mImage;
 
     //DATA
-    private Expense mOriginalExpense = null;
+    private Transaction mOriginalExpense = null;
    //
    // int mCreditPeriodId = -1;
     Currency mCurrency = null;
@@ -106,13 +106,13 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
         // Use `newInstance` instead as shown below
     }
 
-    public static CreateOrEditTransactionDialogFragment newInstance(ExpenseManagerDAO dao, @NonNull  Currency currency, @Nullable Expense originalExpense) {
+    public static CreateOrEditTransactionDialogFragment newInstance(ExpenseManagerDAO dao, @NonNull  Currency currency, @Nullable Transaction originalExpense) {
         CreateOrEditTransactionDialogFragment frag = new CreateOrEditTransactionDialogFragment();
         Bundle args = new Bundle();
         //args.putInt(TAG_ARGS_PERIOD_ID, creditPeriodId);
         args.putSerializable(TAG_ARGS_CURRENCY, currency);
         if(originalExpense != null)
-            args.putSerializable(TAG_ARGS_ORIGINAL_EXPENSE, originalExpense);
+            args.putSerializable(TAG_ARGS_ORIGINAL_TRANSACTION, originalExpense);
         frag.setArguments(args);
         frag.setDao(dao);
         return frag;
@@ -143,7 +143,7 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
 
         // Fetch arguments from bundle and set title
         mCurrency = (Currency) getArguments().getSerializable(TAG_ARGS_CURRENCY);
-        mOriginalExpense = (Expense) getArguments().getSerializable(TAG_ARGS_ORIGINAL_EXPENSE);
+        mOriginalExpense = (Transaction) getArguments().getSerializable(TAG_ARGS_ORIGINAL_TRANSACTION);
         //mCreditPeriodId =  getArguments().getInt(TAG_ARGS_PERIOD_ID, -1);
 
        // if(mCreditPeriodId == -1 || mCurrency == null) {
@@ -170,21 +170,39 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
         mCreateButton.setOnClickListener(this);
         mImage.setOnClickListener(this);
 
-        //Set spinners
-        expenseCategories = mDao.getTransactionCategoryList();
-        ArrayAdapter expenseCategoryAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, expenseCategories);
-        expenseCategoryAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-        mExpenseCategory.setAdapter(expenseCategoryAdapter);
+
 
         expenseTypes = new ArrayList<>(Arrays.asList(TransactionType.values()));
         ArrayAdapter expenseTypeAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, expenseTypes);
         expenseTypeAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         mExpenseType.setAdapter(expenseTypeAdapter);
+        mExpenseType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                expenseCategories = mDao.getTransactionCategoryList(expenseTypes.get(position));
+                ArrayAdapter expenseCategoryAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, expenseCategories);
+                expenseCategoryAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+                mExpenseCategory.setAdapter(expenseCategoryAdapter);
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
+        });
         //If editing an existing expense, set its values
-        if(mOriginalExpense != null)
+        if(mOriginalExpense != null) {
+            expenseCategories = mDao.getTransactionCategoryList(mOriginalExpense.getTransactionType());
             setOriginalExpenseValues();
-
+         }
+        else
+        {
+            expenseCategories = mDao.getTransactionCategoryList(expenseTypes.get(0));
+        }
+        ArrayAdapter expenseCategoryAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, expenseCategories);
+        expenseCategoryAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        mExpenseCategory.setAdapter(expenseCategoryAdapter);
         // Show soft keyboard automatically and request focus to field
         mAmountText.requestFocus();
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
@@ -193,8 +211,15 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
     private void setOriginalExpenseValues() {
         mAmountText.setText(mOriginalExpense.getAmount().toPlainString());
         mDescriptionText.setText(mOriginalExpense.getDescription());
-        mExpenseCategory.setSelection(expenseCategories.indexOf(mOriginalExpense.getExpenseCategory()));
-        mExpenseType.setSelection(expenseTypes.indexOf(mOriginalExpense.getExpenseType()));
+        int index=0;
+        for(TransactionCategory tc:expenseCategories) {
+            if (mOriginalExpense.getTransactionCategory().getId() == tc.getId()) {
+                mExpenseCategory.setSelection(index);
+            }
+            index++;
+        }
+        //expenseCategories.indexOf(mOriginalExpense.getTransactionCategory()));
+        mExpenseType.setSelection(expenseTypes.indexOf(mOriginalExpense.getTransactionType()));
         mCreateButton.setText(R.string.dialog_create_expense_button_edit);
         getDialog().setTitle(R.string.dialog_create_edit_expense_title);
 

@@ -9,9 +9,7 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import ve.com.abicelis.creditcardexpensemanager.R;
-import ve.com.abicelis.creditcardexpensemanager.app.holders.ExpensesViewHolder;
 import ve.com.abicelis.creditcardexpensemanager.app.holders.TransactionViewHolder;
-import ve.com.abicelis.creditcardexpensemanager.model.Expense;
 import ve.com.abicelis.creditcardexpensemanager.model.Transaction;
 
 /**

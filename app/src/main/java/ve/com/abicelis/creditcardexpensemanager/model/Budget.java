@@ -13,7 +13,7 @@ import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseCategory;
  * Created by Alex on 7/8/2016.
  */
 
-public class Budget {
+/*public class Budget {
 
     public static final int PERIOD_NAME_LARGEST_MONTH = 0;
     public static final int PERIOD_NAME_COMPLETE = 1;
@@ -26,7 +26,7 @@ public class Budget {
     private Calendar endDate;
     private BigDecimal creditLimit;
 
-    private List<Expense> expenses = new ArrayList<>();
+    private List<Transaction> expenses = new ArrayList<>();
     private List<Payment> payments = new ArrayList<>();
 
 
@@ -70,7 +70,7 @@ public class Budget {
      * PERIOD_NAME_COMPLETE         -> "Feb 4 - Mar 3"      or
      * PERIOD_NAME_COMPLETE_NUMERIC -> "02/04 - 03/03"
      */
-    public String getPeriodName() {
+   /* public String getPeriodName() {
         if(periodName == null) {
             StringBuilder sb = new StringBuilder(40);
             switch(periodNameStyle) {
@@ -151,7 +151,7 @@ public class Budget {
      * Returns the sum of all the expenses, minus all the payments for this CreditPeriod
      * Positive value means there are unpaid expenses
      * @return
-     */
+     *//*
     public BigDecimal getExpensesTotal() {
         BigDecimal balance = new BigDecimal(0);
 
@@ -170,7 +170,7 @@ public class Budget {
      * Returns the sum of all the expenses, minus all the payments for this CreditPeriod
      * Positive value means there are unpaid expenses
      * @return
-     */
+     *//*
     public List<BigDecimal> getExpensesByCategory() {
 
         int categoryIndex;
@@ -183,8 +183,8 @@ public class Budget {
         }
 
         //Iterate through expenses, accumulate expenses by category inside expenseByCategory list
-        for (Expense e : expenses) {
-            categoryIndex = e.getExpenseCategory().getIndex();
+        for (Transaction e : expenses) {
+            categoryIndex = e.getTransactionCategory().getId();
             BigDecimal currentVal = expenseByCategory.get(categoryIndex);
             expenseByCategory.set(categoryIndex, currentVal.add(e.amount));
         }
@@ -195,7 +195,7 @@ public class Budget {
 
     /**
      * Returns creditLimit - expensesTotal = the available credit
-     */
+     *
     public BigDecimal getAvailableCredit() {
         return getCreditLimit().subtract(getExpensesTotal());
     }
@@ -203,7 +203,7 @@ public class Budget {
 
     /**
      * Returns the days in this period, startDate - endDate
-     */
+     *
     public int getTotalDaysInPeriod() {
 
         // Create copies so we don't update the original calendars.
@@ -324,4 +324,4 @@ public class Budget {
                 " creditLimit=" + creditLimit;
     }
 
-}
+}*/

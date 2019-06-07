@@ -4,9 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentManager;
@@ -17,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,14 +22,13 @@ import android.widget.Toast;
 import java.io.FileNotFoundException;
 
 import ve.com.abicelis.creditcardexpensemanager.R;
-import ve.com.abicelis.creditcardexpensemanager.app.dialogs.CreateOrEditExpenseDialogFragment;
+import ve.com.abicelis.creditcardexpensemanager.app.dialogs.CreateOrEditTransactionDialogFragment;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.Constants;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.DateUtils;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.ImageUtils;
 import ve.com.abicelis.creditcardexpensemanager.database.ExpenseManagerDAO;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotDeleteDataException;
-import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotGetDataException;
-import ve.com.abicelis.creditcardexpensemanager.model.Expense;
+import ve.com.abicelis.creditcardexpensemanager.model.Transaction;
 
 /**
  * Created by Alex on 19/8/2016.
@@ -40,7 +36,7 @@ import ve.com.abicelis.creditcardexpensemanager.model.Expense;
 public class ExpenseDetailActivity extends AppCompatActivity implements  View.OnClickListener {
 
     public static final String INTENT_EXTRAS_EXPENSE = "INTENT_EXTRAS_EXPENSE";
-    public static final String INTENT_EXTRAS_CREDIT_PERIOD_ID = "INTENT_EXTRAS_CREDIT_PERIOD_ID";
+    //public static final String INTENT_EXTRAS_CREDIT_PERIOD_ID = "INTENT_EXTRAS_CREDIT_PERIOD_ID";
 
     //UI
     private Toolbar mToolbar;
@@ -54,7 +50,7 @@ public class ExpenseDetailActivity extends AppCompatActivity implements  View.On
     //private Button mDelete;
 
     //DATA
-    private Expense mExpense;
+    private Transaction mExpense;
     private int mCreditPeriodId;
     private boolean expenseEdited = false;
 
@@ -70,8 +66,8 @@ public class ExpenseDetailActivity extends AppCompatActivity implements  View.On
 
         //Try to get the expense and the periodId, sent from the caller activity
         try {
-            mExpense = (Expense) getIntent().getSerializableExtra(INTENT_EXTRAS_EXPENSE);
-            mCreditPeriodId = getIntent().getIntExtra(INTENT_EXTRAS_CREDIT_PERIOD_ID, -1);
+            mExpense = (Transaction) getIntent().getSerializableExtra(INTENT_EXTRAS_EXPENSE);
+            //mCreditPeriodId = getIntent().getIntExtra(INTENT_EXTRAS_CREDIT_PERIOD_ID, -1);
         } catch (Exception e) {
             mExpense = null;
         }
@@ -125,13 +121,13 @@ public class ExpenseDetailActivity extends AppCompatActivity implements  View.On
     private void setUpExpenseDetails() {
         mAmount.setText(mExpense.getAmount().toPlainString());
         mDescription.setText(mExpense.getDescription());
-        mDate.setText(DateUtils.getShortDateString(mExpense.getDate()) + "\r\n" + DateUtils.getRelativeTimeSpanString(mExpense.getDate()));
+        //mDate.setText(DateUtils.getShortDateString(mExpense.getDate()) + "\r\n" + DateUtils.getRelativeTimeSpanString(mExpense.getDate()));
 
-        this.mCategory.setText(mExpense.getExpenseCategory().getFriendlyName());
-        ((GradientDrawable)this.mCategory.getBackground()).setColor(ContextCompat.getColor(this, mExpense.getExpenseCategory().getColor()));
+        this.mCategory.setText(mExpense.getTransactionCategory().getName());
+        //((GradientDrawable)this.mCategory.getBackground()).setColor(ContextCompat.getColor(this, mExpense.getExpenseCategory().getColor()));
 
-        this.mType.setText(mExpense.getExpenseType().getFriendlyName());
-        ((GradientDrawable)this.mType.getBackground()).setColor(ContextCompat.getColor(this, mExpense.getExpenseType().getColor()));
+        this.mType.setText(mExpense.getTransactionType().getFriendlyName());
+        //((GradientDrawable)this.mType.getBackground()).setColor(ContextCompat.getColor(this, mExpense.getExpenseType().getColor()));
 
         try {
             Bitmap image = mExpense.getFullImage();
@@ -212,7 +208,7 @@ public class ExpenseDetailActivity extends AppCompatActivity implements  View.On
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         try{
-                            new ExpenseManagerDAO(ExpenseDetailActivity.this).deleteExpense(mExpense.getId());
+                            new ExpenseManagerDAO(ExpenseDetailActivity.this).deleteTransaction(mExpense.getId());
                             setResult(Constants.RESULT_REFRESH_DATA);
                             onBackPressed();
                         } catch(CouldNotDeleteDataException e) {
@@ -232,7 +228,7 @@ public class ExpenseDetailActivity extends AppCompatActivity implements  View.On
 
     private void handleOnEdit() {
         FragmentManager fm = getSupportFragmentManager();
-        CreateOrEditExpenseDialogFragment dialog = CreateOrEditExpenseDialogFragment.newInstance(
+        CreateOrEditTransactionDialogFragment dialog = CreateOrEditTransactionDialogFragment.newInstance(
                 new ExpenseManagerDAO(ExpenseDetailActivity.this),
                 mExpense.getCurrency(),
                 mExpense);
@@ -241,7 +237,7 @@ public class ExpenseDetailActivity extends AppCompatActivity implements  View.On
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
                 try {
-                    mExpense = new ExpenseManagerDAO(getApplicationContext()).getExpense(mExpense.getId());
+                    mExpense = new ExpenseManagerDAO(getApplicationContext()).getTransaction(mExpense.getId());
                     expenseEdited = true;
                 }catch (Exception e) {
                     Toast.makeText(ExpenseDetailActivity.this, "Error when updating data", Toast.LENGTH_SHORT).show();

@@ -36,7 +36,7 @@
 
 
     /* Overview Fragment */
-    <string name="fragment_overview_credit_balance_title">Budget:</string>
+    <string name="fragment_overview_credit_balance_title">Total Budget:</string>
 
     <string name="fragment_overview_credit_extra_info_spendiest_day">The spendiest day in this period is %1$s, where you spent %2$s %3$s.</string>
     <string name="fragment_overview_credit_extra_info_spendiest_category">The %1$s category represents %2$s%% of this month\'s expenses.</string>
@@ -74,8 +74,8 @@
     <string name="activity_add_new_cc_exit_dialog_button_cancel">Cancel</string>
 
 
-    /*Expense detail activity*/
-    <string name="activity_expense_detail_title">Expense Details</string>
+    /*Transaction detail activity*/
+    <string name="activity_expense_detail_title">Transaction Details</string>
     <string name="activity_expense_detail_label_amount">Amount:</string>
     <string name="activity_expense_detail_label_date">Date:</string>
     <string name="activity_expense_detail_label_description">Description:</string>
@@ -93,8 +93,8 @@
     <string name="fragment_preferences_no_permissions_dialog_text">The data could not be imported/exported because the application does not have writing permission.</string>
 
     /*Dialog delete expense*/
-    <string name="dialog_delete_expense_title">Delete Expense</string>
-    <string name="dialog_delete_expense_message">Are you sure you want to delete this Expense?</string>
+    <string name="dialog_delete_expense_title">Delete Transaction</string>
+    <string name="dialog_delete_expense_message">Are you sure you want to delete this Transaction?</string>
     <string name="dialog_delete_expense_button_yes">Yes</string>
     <string name="dialog_delete_expense_button_no">No</string>
 
@@ -103,8 +103,8 @@
 
     /*Dialog create expense*/
     <string name="dialog_capture_ocr_text_title">Capture text</string>
-    <string name="dialog_create_expense_title">Create new Expense</string>
-    <string name="dialog_create_edit_expense_title">Edit an Expense</string>
+    <string name="dialog_create_expense_title">Create new Transaction</string>
+    <string name="dialog_create_edit_expense_title">Edit an Transaction</string>
     <string name="dialog_create_expense_amount">Amount</string>
     <string name="dialog_create_expense_image">Image</string>
     <string name="dialog_create_expense_description">Description</string>
@@ -147,7 +147,7 @@
 
 
     /*OCR Create Expense activity*/
-    <string name="activity_create_expense_ocr_title">Create expense (OCR)</string>
+    <string name="activity_create_expense_ocr_title">Create Transaction (OCR)</string>
     <string name="activity_create_expense_ocr_detected_text">Detected text:</string>
     <string name="activity_create_expense_ocr_btn_capture">Capture</string>
 

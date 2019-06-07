@@ -35,7 +35,8 @@ public final class ExpenseManagerContract {
         public static final TableColumn COLUMN_NAME_END_DATE = new TableColumn(DataType.INTEGER, "enddate");
         public static final TableColumn COLUMN_NAME_CREDIT_LIMIT = new TableColumn(DataType.TEXT, "creditlimit");
     }
-    /* Expense Table */
+
+    /* Expense Table *
     public static abstract class ExpenseTable implements BaseColumns {
         public static final String TABLE_NAME = "expense";
 
@@ -49,7 +50,7 @@ public final class ExpenseManagerContract {
         public static final TableColumn COLUMN_NAME_DATE = new TableColumn(DataType.INTEGER, "date");
         public static final TableColumn COLUMN_NAME_EXPENSE_CATEGORY = new TableColumn(DataType.TEXT, "expensecategory");
         public static final TableColumn COLUMN_NAME_EXPENSE_TYPE = new TableColumn(DataType.TEXT, "expensetype");
-    }
+    }*/
 
     /* Payment Table */
     public static abstract class PaymentTable implements BaseColumns {

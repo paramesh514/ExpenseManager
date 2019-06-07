@@ -1,7 +1,6 @@
 package ve.com.abicelis.creditcardexpensemanager.app.fragments;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -23,14 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ve.com.abicelis.creditcardexpensemanager.R;
-import ve.com.abicelis.creditcardexpensemanager.app.activities.AddAccountActivity;
-import ve.com.abicelis.creditcardexpensemanager.app.adapters.AccountAdapter;
 import ve.com.abicelis.creditcardexpensemanager.app.adapters.CategoryAdapter;
 import ve.com.abicelis.creditcardexpensemanager.app.dialogs.CreateOrEditCategoryDialogFragment;
 import ve.com.abicelis.creditcardexpensemanager.app.dialogs.EditOrDeleteAccountDialogFragment;
-import ve.com.abicelis.creditcardexpensemanager.app.holders.AccountViewHolder;
 import ve.com.abicelis.creditcardexpensemanager.app.holders.CategoryViewHolder;
-import ve.com.abicelis.creditcardexpensemanager.app.holders.ExpensesViewHolder;
 import ve.com.abicelis.creditcardexpensemanager.database.ExpenseManagerDAO;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotDeleteDataException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditCardNotFoundException;
@@ -96,7 +91,7 @@ public class BudgetListFragment extends Fragment {
             public void OnCategoryDeleted(int position) {
                 try {
 
-                    dao.deleteExpense(categories.get(position).getId());
+                    dao.deleteTransactionCategory(categories.get(position).getId());
                     categories.remove(position);
                     adapter.notifyItemRemoved(position);
                     adapter.notifyItemRangeChanged(position, adapter.getItemCount());

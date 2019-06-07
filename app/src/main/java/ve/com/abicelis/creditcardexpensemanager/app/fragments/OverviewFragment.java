@@ -38,6 +38,7 @@ import ve.com.abicelis.creditcardexpensemanager.exceptions.SharedPreferenceNotFo
 import ve.com.abicelis.creditcardexpensemanager.model.Account;
 import ve.com.abicelis.creditcardexpensemanager.model.CreditCard;
 import ve.com.abicelis.creditcardexpensemanager.model.DailyExpense;
+import ve.com.abicelis.creditcardexpensemanager.model.TransactionCategory;
 
 /**
  * Created by abice on 4/10/2016.
@@ -138,13 +139,16 @@ public class OverviewFragment extends Fragment {
                   //  balancePercentage = (int)(100*((float)expensesTotal/creditLimit));
                 //else
                   //  balancePercentage = 0;
-int creditLimit = 1000;
-int expensesTotal = 100;
-                creditBalanceBar.setProgressPercentage(30);
-                creditBalanceBar.setTextHi(creditLimit + " " + currencyCode);
-                if(expensesTotal > 0)
-                    creditBalanceBar.setTextBar(Integer.toString(expensesTotal) + " " + currencyCode);
-                creditBalanceBar.setTextLo("0 " + currencyCode);
+                TransactionCategory tc = dao.getTransactionCategory(0);
+                double creditLimit = tc.getBudget();
+                double expensesTotal = tc.getSpent();
+                if(tc.getBudget() > 0) {
+                    creditBalanceBar.setProgressPercentage((int) (expensesTotal * 100 / creditLimit));
+                    creditBalanceBar.setTextHi(creditLimit + " " + currencyCode);
+                    if (expensesTotal > 0)
+                        creditBalanceBar.setTextBar(Double.toString(expensesTotal) + " " + currencyCode);
+                    creditBalanceBar.setTextLo("0 " + currencyCode);
+                }
 
 
           ///      extraInfo.setText(TextUtils.fromHtml(generateExtraInfo()));

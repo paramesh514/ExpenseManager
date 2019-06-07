@@ -60,8 +60,10 @@ import ve.com.abicelis.creditcardexpensemanager.database.ExpenseManagerDAO;
 import ve.com.abicelis.creditcardexpensemanager.enums.Currency;
 import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseCategory;
 import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseType;
+import ve.com.abicelis.creditcardexpensemanager.enums.TransactionType;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotInsertDataException;
-import ve.com.abicelis.creditcardexpensemanager.model.Expense;
+import ve.com.abicelis.creditcardexpensemanager.model.Transaction;
+import ve.com.abicelis.creditcardexpensemanager.model.TransactionCategory;
 import ve.com.abicelis.creditcardexpensemanager.ocr.OcrDetectorProcessor;
 import ve.com.abicelis.creditcardexpensemanager.ocr.OcrGraphic;
 import ve.com.abicelis.creditcardexpensemanager.ocr.camera.CameraSource;
@@ -122,8 +124,8 @@ public final class OcrCreateExpenseActivity extends AppCompatActivity implements
 
     //DATA
     ExpenseManagerDAO mDao;
-    List<ExpenseCategory> expenseCategories;
-    List<ExpenseType> expenseTypes;
+    List<TransactionCategory> expenseCategories;
+    List<TransactionType> expenseTypes;
     Currency mCurrency = null;
     int mCreditPeriodId = -1;
 
@@ -235,16 +237,18 @@ public final class OcrCreateExpenseActivity extends AppCompatActivity implements
     }
 
     private void setUpSpinners() {
-        //Set spinners
-        expenseCategories = new ArrayList<>(Arrays.asList(ExpenseCategory.values()));
-        ArrayAdapter expenseCategoryAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, expenseCategories);
-        expenseCategoryAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-        mExpenseCategory.setAdapter(expenseCategoryAdapter);
 
-        expenseTypes = new ArrayList<>(Arrays.asList(ExpenseType.values()));
+
+        expenseTypes = new ArrayList<>(Arrays.asList(TransactionType.values()));
         ArrayAdapter expenseTypeAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, expenseTypes);
         expenseTypeAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         mExpenseType.setAdapter(expenseTypeAdapter);
+
+        //Set spinners
+        expenseCategories = mDao.getTransactionCategoryList(expenseTypes.get(0));
+        ArrayAdapter expenseCategoryAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, expenseCategories);
+        expenseCategoryAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        mExpenseCategory.setAdapter(expenseCategoryAdapter);
     }
 
     private void setUpShowcase() {
@@ -618,8 +622,8 @@ public final class OcrCreateExpenseActivity extends AppCompatActivity implements
             return;
         }
 
-        ExpenseCategory expenseCategory = expenseCategories.get(mExpenseCategory.getSelectedItemPosition());
-        ExpenseType expenseType = expenseTypes.get(mExpenseType.getSelectedItemPosition());
+        TransactionCategory expenseCategory = expenseCategories.get(mExpenseCategory.getSelectedItemPosition());
+        TransactionType expenseType = expenseTypes.get(mExpenseType.getSelectedItemPosition());
 
 //        //If a temp photo was ever taken, copy tempFile to photoFile, then delete tempFile!
 //        if(tempImagePath != null) {
@@ -667,9 +671,9 @@ public final class OcrCreateExpenseActivity extends AppCompatActivity implements
 //        } else {
             //Otherwise, insert a new expense
             try {
-                Expense expense = new Expense(description, null, null, new BigDecimal(amount),
+                Transaction expense = new Transaction(description, null, null, new BigDecimal(amount),
                         mCurrency, Calendar.getInstance(), expenseCategory, expenseType);
-                mDao.insertExpense(mCreditPeriodId, expense);
+                mDao.insertTransaction( expense);
             } catch (CouldNotInsertDataException e) {
                 Toast.makeText(this, "There was a problem inserting the Expense", Toast.LENGTH_SHORT).show();
             }

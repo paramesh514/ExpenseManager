@@ -30,7 +30,6 @@ import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditPeriodNotFoundE
 import ve.com.abicelis.creditcardexpensemanager.exceptions.SharedPreferenceNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.model.CreditCard;
 import ve.com.abicelis.creditcardexpensemanager.model.CreditPeriod;
-import ve.com.abicelis.creditcardexpensemanager.model.Expense;
 
 /**
  * Created by abice on 30/1/2017.

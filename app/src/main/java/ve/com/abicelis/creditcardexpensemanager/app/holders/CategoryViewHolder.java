@@ -16,6 +16,7 @@ import ve.com.abicelis.creditcardexpensemanager.R;
 import ve.com.abicelis.creditcardexpensemanager.app.activities.CategoryDetailActivity;
 import ve.com.abicelis.creditcardexpensemanager.app.adapters.CategoryAdapter;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.Constants;
+import ve.com.abicelis.creditcardexpensemanager.app.views.HorizontalBar;
 import ve.com.abicelis.creditcardexpensemanager.model.TransactionCategory;
 
 /**
@@ -30,7 +31,10 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder implements View.
     //UI
     private RelativeLayout mContainer;
     private TextView mBudget;
+    private TextView mSpent;
     private TextView mCategoryName;
+    HorizontalBar creditBalanceBar;
+
     //private TextView mDate;
     private ImageView mImage;
     //private TextView mCategory;
@@ -47,12 +51,15 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder implements View.
 
         mContainer = (RelativeLayout) itemView.findViewById(R.id.list_item_categories_container);
         mBudget = (TextView) itemView.findViewById(R.id.list_item_category_budget);
+        mSpent = (TextView) itemView.findViewById(R.id.list_item_category_spent);
         mCategoryName = (TextView) itemView.findViewById(R.id.list_item_category_name);
         //mDate = (TextView) itemView.findViewById(R.id.list_item_expenses_txt_date);
         mImage = (ImageView) itemView.findViewById(R.id.list_item_category_img_image);
         //mCategory = (TextView) itemView.findViewById(R.id.list_item_expenses_txt_category);
         mType = (TextView) itemView.findViewById(R.id.list_item_category_transaction_type);
         mDeleteIcon = (ImageView) itemView.findViewById(R.id.list_item_category_img_delete);
+        creditBalanceBar = (HorizontalBar) itemView.findViewById(R.id.frag_category_buget_bar);
+
     }
 
     public void setData(CategoryAdapter adapter, Fragment fragment, TransactionCategory current, int position) {
@@ -63,6 +70,7 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder implements View.
         this.mCategoryPosition = position;
 
         this.mBudget.setText(String.valueOf(current.getBudget()));
+        this.mSpent.setText(String.valueOf(current.getSpent()));
         this.mCategoryName.setText(current.getName());
         //this.mDate.setText(DateUtils.getRelativeTimeSpanString(current.getDate()));
 
@@ -70,7 +78,17 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder implements View.
         //((GradientDrawable)this.mCategory.getBackground()).setColor(ContextCompat.getColor(mFragment.getContext(), current.getExpenseCategory().getColor()));
 
         this.mType.setText(current.getType().getCode());
-       // ((GradientDrawable)this.mType.getBackground()).setColor(ContextCompat.getColor(mFragment.getContext(), current.getExpenseType().getColor()));
+        if(current.getBudget()>0) {
+            creditBalanceBar.setProgressPercentage((int) ((current.getSpent() * 100.0) / current.getBudget()));
+            creditBalanceBar.setTextHi(current.getBudget() + "");
+            if (current.getSpent() > 0)
+                creditBalanceBar.setTextBar(current.getSpent() + "");
+            creditBalanceBar.setTextLo("0 ");
+        }
+        else
+            creditBalanceBar.setVisibility(View.INVISIBLE);
+
+        // ((GradientDrawable)this.mType.getBackground()).setColor(ContextCompat.getColor(mFragment.getContext(), current.getExpenseType().getColor()));
 
 
 //        if(current.getThumbnail() != null && current.getThumbnail().length > 0)
