@@ -123,7 +123,7 @@ public class ExpenseDetailActivity extends AppCompatActivity implements  View.On
         mDescription.setText(mExpense.getDescription());
         //mDate.setText(DateUtils.getShortDateString(mExpense.getDate()) + "\r\n" + DateUtils.getRelativeTimeSpanString(mExpense.getDate()));
 
-        this.mCategory.setText(mExpense.getTransactionCategory().getName());
+        this.mCategory.setText(mExpense.getTransactionCategory().getmName());
         //((GradientDrawable)this.mCategory.getBackground()).setColor(ContextCompat.getColor(this, mExpense.getExpenseCategory().getColor()));
 
         this.mType.setText(mExpense.getTransactionType().getFriendlyName());

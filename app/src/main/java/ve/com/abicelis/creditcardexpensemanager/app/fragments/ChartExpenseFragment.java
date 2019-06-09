@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import lecho.lib.hellocharts.formatter.SimpleAxisValueFormatter;
@@ -34,6 +35,7 @@ import ve.com.abicelis.creditcardexpensemanager.exceptions.SharedPreferenceNotFo
 import ve.com.abicelis.creditcardexpensemanager.model.CreditCard;
 import ve.com.abicelis.creditcardexpensemanager.model.CreditPeriod;
 import ve.com.abicelis.creditcardexpensemanager.model.DailyExpense;
+import ve.com.abicelis.creditcardexpensemanager.model.TransactionCategory;
 
 /**
  * Created by Alex on 17/8/2016.
@@ -46,11 +48,11 @@ public class ChartExpenseFragment extends Fragment {
 
     //DATA
     private boolean chartIsVisible = false;
-    private int activeCreditCardId;
+    //private int activeCreditCardId;
     private ExpenseManagerDAO dao;
     private LineChartData data;
-    CreditPeriod creditPeriod;
-    CreditCard creditCard;
+    //CreditPeriod creditPeriod;
+    //CreditCard creditCard;
 
 
     @Nullable
@@ -62,13 +64,6 @@ public class ChartExpenseFragment extends Fragment {
         chart = (LineChartView) rootView.findViewById(R.id.chart_expenses_linechart);
         mNoExpensesContainer = (RelativeLayout) rootView.findViewById(R.id.chart_expenses_no_expenses_container);
 
-        try {
-            activeCreditCardId = SharedPreferencesUtils.getInt(getContext(), Constants.ACTIVE_CC_ID);
-        }catch(SharedPreferenceNotFoundException e) {
-            //This shouldn't happen
-            //Toast.makeText(getActivity(), "Megapeo en oncreate, SharedPreferenceNotFoundException CreditCardNotFoundException", Toast.LENGTH_SHORT).show();
-        }
-
         refreshData();
         return rootView;
     }
@@ -79,17 +74,10 @@ public class ChartExpenseFragment extends Fragment {
             dao = new ExpenseManagerDAO(getActivity());
 
 
-        //Refresh list from DB
-        try {
-            creditCard = dao.getCreditCardWithCreditPeriod(activeCreditCardId, 0);
-            creditPeriod = creditCard.getCreditPeriods().get(0);
-        }catch(CreditCardNotFoundException | CreditPeriodNotFoundException e) {
-            Toast.makeText(getActivity(), getResources().getString(R.string.err_problem_loading_card_or_no_card_exists), Toast.LENGTH_SHORT).show();
-        }
 
 
         //Check if there are no expenses in this period or there is no active credit card
-        if(creditCard == null || creditPeriod.getExpensesTotal().equals(BigDecimal.ZERO)) {
+        if(dao.getTransactionList().size() == 0) {
             chart.setVisibility(View.GONE);
             mNoExpensesContainer.setVisibility(View.VISIBLE);
             return;
@@ -103,16 +91,20 @@ public class ChartExpenseFragment extends Fragment {
         List<PointValue> accumulatedValues = new ArrayList<>();
         List<PointValue> dailyValues = new ArrayList<>();
         List<PointValue> maxValue = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+
+        TransactionCategory tcAll = dao.getTransactionCategory(0);
+        double expensesTotal = tcAll.getSpent()*1.1;
 
         //Set maxValue (CreditLimit)
-        maxValue.add(new PointValue(0, creditPeriod.getCreditLimit().floatValue()));
-        maxValue.add(new PointValue(creditPeriod.getTotalDaysInPeriod(), creditPeriod.getCreditLimit().floatValue()));
+        maxValue.add(new PointValue(0, (float)expensesTotal));
+        maxValue.add(new PointValue(calendar.getActualMaximum(Calendar.DAY_OF_MONTH), (float)expensesTotal));
 
 
         //Set daily and accumulated values.
-        List<DailyExpense> dailyExpenses = creditPeriod.getDailyExpenses();
-        List<DailyExpense> accumulatedDailyExpenses = creditPeriod.getAccumulatedDailyExpenses();
-        for (int i = 0; i < creditPeriod.getTotalDaysInPeriod(); ++i) {
+        List<DailyExpense> dailyExpenses = dao.getDailyExpenses();
+        List<DailyExpense> accumulatedDailyExpenses = dao.getAccumulatedDailyExpenses();
+        for (int i = 0; i < calendar.getActualMaximum(Calendar.DAY_OF_MONTH); ++i) {
 
             PointValue aux = new PointValue(i, 1);
             //PointValue aux = new PointValue(i, accumulatedDailyExpenses.get(i).getAmount().floatValue());
@@ -157,7 +149,7 @@ public class ChartExpenseFragment extends Fragment {
 
         Axis axisY = new Axis().setHasLines(true)
                 .setHasTiltedLabels(true)
-                .setName("Money (" + creditCard.getCurrency().getCode() + ")")
+                .setName("Money (" + "INR" + ")")
                 .setFormatter(new MoneyFormatter());
 
         data.setAxisXBottom(axisX);

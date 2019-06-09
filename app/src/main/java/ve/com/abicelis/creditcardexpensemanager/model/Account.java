@@ -21,7 +21,7 @@ import ve.com.abicelis.creditcardexpensemanager.enums.Currency;
  * Created by Alex on 6/8/2016.
  */
 public class Account implements Serializable {
-
+    public static  int CASH_ID =0;
     private int id;
     private String nickName;
     private String bankName;
@@ -162,14 +162,6 @@ public class Account implements Serializable {
 
     @Override
     public String toString() {
-        return  "ID=" + id + "\r\n" +
-                " nickName=" + nickName + "\r\n" +
-                " accNumber=" + accNumber + "\r\n" +
-                " currency=" + currency + "\r\n" +
-                " accountType=" + accountType + "\r\n" +
-                " balance="+balance+"\r\n"+
-                " balanceUpdated=" + balanceUpdated + "\r\n" +
-                " isAcitve="+isActive+"\r\n"+
-                " creditPeriods=" + linkedCards;
+        return  getNickName();
     }
 }

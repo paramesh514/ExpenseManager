@@ -36,7 +36,7 @@
 
 
     /* Overview Fragment */
-    <string name="fragment_overview_credit_balance_title">Total Budget:</string>
+    <string name="fragment_overview_credit_balance_title">Budget:</string>
 
     <string name="fragment_overview_credit_extra_info_spendiest_day">The spendiest day in this period is %1$s, where you spent %2$s %3$s.</string>
     <string name="fragment_overview_credit_extra_info_spendiest_category">The %1$s category represents %2$s%% of this month\'s expenses.</string>

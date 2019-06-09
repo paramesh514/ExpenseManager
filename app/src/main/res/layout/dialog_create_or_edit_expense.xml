@@ -48,6 +48,9 @@
                     android:backgroundTint="@color/gray_700"
                     />
             </LinearLayout>
+
+
+
             <LinearLayout
                 android:layout_width="60dp"
                 android:layout_height="match_parent"
@@ -64,12 +67,54 @@
         </LinearLayout>
 
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:backgroundTint="@color/gray_700">
 
+
+
+            <TextView
+                android:id="@+id/dialog_create_expense_label_from"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
+                android:text="From"/>
+
+            <Spinner
+                android:id="@+id/dialog_create_expense_giver"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:theme="@style/SpinnerStyle"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/dialog_create_expense_label_to"
+            android:text="To"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/gray_700"/>
+
+        <EditText
+            android:id="@+id/dialog_create_expense_to"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:singleLine="false"
+            android:text=""
+            android:imeOptions="actionDone"
+            android:backgroundTint="@color/gray_700"
+            />
 
         <TextView
             android:id="@+id/dialog_create_expense_label_description"
             android:text="@string/dialog_create_expense_description"
             android:layout_width="wrap_content"
+            android:layout_marginTop="4dp"
             android:layout_height="wrap_content" />
 
         <EditText

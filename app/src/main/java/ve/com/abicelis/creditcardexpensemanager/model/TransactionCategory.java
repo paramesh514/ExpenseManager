@@ -15,6 +15,11 @@ public class TransactionCategory implements Serializable {
     private int mColor;
     private double budget;
     private double spent;
+    public static final String ALL ="0";
+    public static final String U_EXPENSE="1";
+    public static final String U_INCOME="2";
+    public static final String U_TRANSFER="3";
+    public static final String U_CORRECTION="4";
 
     public TransactionCategory(String friendlyName,TransactionType type,double budget,double spent) {
 
@@ -34,11 +39,7 @@ public class TransactionCategory implements Serializable {
         return mColor;
     }
 
-    public String getName() {
-        return mName;
-    }
-
-    @Override
+       @Override
     public String toString() {
         return mName;
     }

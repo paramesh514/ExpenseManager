@@ -2,9 +2,9 @@ package ve.com.abicelis.creditcardexpensemanager.database;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.Editable;
 
 import java.math.BigDecimal;
 import java.security.InvalidParameterException;
@@ -18,8 +18,6 @@ import ve.com.abicelis.creditcardexpensemanager.enums.AccountType;
 import ve.com.abicelis.creditcardexpensemanager.enums.CreditCardBackground;
 import ve.com.abicelis.creditcardexpensemanager.enums.CreditCardType;
 import ve.com.abicelis.creditcardexpensemanager.enums.Currency;
-import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseCategory;
-import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseType;
 import ve.com.abicelis.creditcardexpensemanager.enums.TransactionType;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.AccountNotFoundException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotDeleteDataException;
@@ -32,6 +30,7 @@ import ve.com.abicelis.creditcardexpensemanager.model.Account;
 import ve.com.abicelis.creditcardexpensemanager.model.CreditCard;
 import ve.com.abicelis.creditcardexpensemanager.model.CreditPeriod;
 //import ve.com.abicelis.creditcardexpensemanager.model.Expense;
+import ve.com.abicelis.creditcardexpensemanager.model.DailyExpense;
 import ve.com.abicelis.creditcardexpensemanager.model.Payment;
 import ve.com.abicelis.creditcardexpensemanager.model.Transaction;
 import ve.com.abicelis.creditcardexpensemanager.model.TransactionCategory;
@@ -88,8 +87,90 @@ public class ExpenseManagerDAO {
         } finally {
             cursor.close();
         }
+        for(Account acc:accounts)
+        {
+            double income,expense,transferIn,transferOut,corrections;
+            income = getTotalForAccount(acc.getId(),TransactionType.INCOME);
+            transferIn = getTransferInForAccount(acc.getId());
+            expense = getTotalForAccount(acc.getId(),TransactionType.EXPENSE);
+            transferOut = getTotalForAccount(acc.getId(),TransactionType.TRANSFER);
+            corrections = getTotalForAccount(acc.getId(),TransactionType.CORRECTION);
+            acc.setBalance(income-expense+transferIn-transferOut+corrections);
+        }
 
         return accounts;
+    }
+
+    private double getTransferInForAccount(int id) {
+
+        double totalAmount=0.0;
+        String whereClause = ExpenseManagerContract.TransactionTable.COLUMN_NAME_FOREIGN_KEY_RECIEVER.getName() +
+                " = " + id ;
+        String[] tableColumns = new String[] {
+                "sum("+ ExpenseManagerContract.TransactionTable.COLUMN_NAME_AMOUNT.getName() +") As total"
+        };
+        // String whereClause = " strftime('%m',"+ ExpenseManagerContract.ExpenseTable.COLUMN_NAME_DATE.getName() +
+        //       ") = strftime('%m',CURRENT_DATE) AND strftime('%Y',"+ ExpenseManagerContract.ExpenseTable.COLUMN_NAME_DATE.getName() +
+        //     ") = strftime('%Y',CURRENT_DATE) "+
+
+        whereClause += " AND " +ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_TYPE.getName() +
+                    " = '" + TransactionType.TRANSFER.getCode() +"'";
+
+
+        SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
+
+        Cursor cursor = db.query(ExpenseManagerContract.TransactionTable.TABLE_NAME, tableColumns, whereClause, null, null, null,null);
+
+        try {
+            while (cursor.moveToNext()) {
+                totalAmount = new Double(cursor.getString(cursor.getColumnIndex("total")));
+
+            }
+        }
+        catch (Exception e)
+        {
+
+        }
+        finally {
+            cursor.close();
+        }
+
+        return totalAmount;
+    }
+
+    private double getTotalForAccount(int id, TransactionType type) {
+
+        double totalAmount=0.0;
+        String whereClause = ExpenseManagerContract.TransactionTable.COLUMN_NAME_FOREIGN_KEY_GIVER.getName() +" = " + id;
+        String[] tableColumns = new String[] {
+                "sum("+ ExpenseManagerContract.TransactionTable.COLUMN_NAME_AMOUNT.getName() +") As total"
+        };
+        // String whereClause = " strftime('%m',"+ ExpenseManagerContract.ExpenseTable.COLUMN_NAME_DATE.getName() +
+        //       ") = strftime('%m',CURRENT_DATE) AND strftime('%Y',"+ ExpenseManagerContract.ExpenseTable.COLUMN_NAME_DATE.getName() +
+        //     ") = strftime('%Y',CURRENT_DATE) "+
+
+        whereClause += " AND " +ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_TYPE.getName() +
+                    " = '" +  type.getCode() +"'";
+
+        SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
+
+        Cursor cursor = db.query(ExpenseManagerContract.TransactionTable.TABLE_NAME, tableColumns, whereClause, null, null, null,null);
+
+        try {
+            while (cursor.moveToNext()) {
+                totalAmount = new Double(cursor.getString(cursor.getColumnIndex("total")));
+
+            }
+        }
+        catch (Exception e)
+        {
+
+        }
+        finally {
+            cursor.close();
+        }
+
+        return totalAmount;
     }
 
     public List<Transaction> getTransactionList() {
@@ -110,7 +191,26 @@ public class ExpenseManagerDAO {
 
         return accounts;
     }
-    public double getBudgetSpend(TransactionType ty,int tid) {
+    public List<Transaction> getTransactionList(TransactionType type) {
+
+        List<Transaction> accounts = new ArrayList<>();
+        SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
+        String where = ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_TYPE.getName() +
+        " = '" +  type.getCode() +"'";
+        Cursor cursor = db.query(ExpenseManagerContract.TransactionTable.TABLE_NAME, null, where, null, null, null,
+                ExpenseManagerContract.TransactionTable._ID+" DESC");
+
+        try {
+            while (cursor.moveToNext()) {
+                accounts.add(getTransactionFromCursor(cursor));
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return accounts;
+    }
+    public double getBudgetSpendForCurrentMonth(TransactionType ty, int tid) {
 
         double totalAmount=0.0;
         String whereClause = ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_TYPE.getName() +
@@ -151,9 +251,12 @@ public class ExpenseManagerDAO {
 
         List<TransactionCategory> transactionCategories = new ArrayList<>();
         SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
-
-        Cursor cursor = db.query(ExpenseManagerContract.TransactionCategoryTable.TABLE_NAME, null, null, null, null, null,
-                ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_BUDGET.getName()+" DESC");
+        String where = ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRASACTION_TYPE.getName()+" <> '"+
+                TransactionType.CORRECTION.getCode()+"' AND "+ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_DESCRIPTION.getName()+
+                " <> 'UnCategorized'";
+        Cursor cursor = db.query(ExpenseManagerContract.TransactionCategoryTable.TABLE_NAME, null, where, null, null, null,
+                ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRASACTION_TYPE.getName()+","+
+                ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_DESCRIPTION.getName());
 
         try {
             while (cursor.moveToNext()) {
@@ -164,7 +267,7 @@ public class ExpenseManagerDAO {
         }
         for(TransactionCategory tc:transactionCategories)
         {
-            tc.setSpent(getBudgetSpend(tc.getType(),tc.getId()));
+            tc.setSpent(getBudgetSpendForCurrentMonth(tc.getType(),tc.getId()));
         }
         return transactionCategories;
     }
@@ -187,7 +290,7 @@ public class ExpenseManagerDAO {
         }
         for(TransactionCategory tc:transactionCategories)
         {
-            tc.setSpent(getBudgetSpend(tc.getType(),tc.getId()));
+            tc.setSpent(getBudgetSpendForCurrentMonth(tc.getType(),tc.getId()));
         }
         return transactionCategories;
     }
@@ -257,7 +360,17 @@ public class ExpenseManagerDAO {
             throw new AccountNotFoundException("Database UNIQUE constraint failure, more than one record found. Passed value=" + accId);
 
         cursor.moveToNext();
-        return getAccountFromCursor(cursor);
+        Account acc = getAccountFromCursor(cursor);
+
+        double income,expense,transferIn,transferOut,corrections;
+        income = getTotalForAccount(acc.getId(),TransactionType.INCOME);
+        transferIn = getTransferInForAccount(acc.getId());
+        expense = getTotalForAccount(acc.getId(),TransactionType.EXPENSE);
+        transferOut = getTotalForAccount(acc.getId(),TransactionType.TRANSFER);
+        corrections = getTotalForAccount(acc.getId(),TransactionType.CORRECTION);
+        acc.setBalance(income-expense+transferIn-transferOut+corrections);
+
+        return acc;
     }
 
     public TransactionCategory getTransactionCategory(int catId) {
@@ -275,7 +388,7 @@ public class ExpenseManagerDAO {
         cursor.moveToNext();
         TransactionCategory tc = getTransactionCategoryFromCursor(cursor);
         cursor.close();
-        tc.setSpent(getBudgetSpend(tc.getType(),tc.getId()));
+        tc.setSpent(getBudgetSpendForCurrentMonth(tc.getType(),tc.getId()));
         return  tc;
     }
 
@@ -620,19 +733,36 @@ public class ExpenseManagerDAO {
     /* Update data on database */
     public long updateAccount(Account account) throws CouldNotUpdateDataException {
         SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
-
+        double correctedBalance =0.0;
         //Set values
         ContentValues values = getValuesFromAccount(account);
 
         //Which row to update
         String selection = ExpenseManagerContract.AccountTable._ID + " =? ";
         String[] selectionArgs = { String.valueOf(account.getId()) };
+        try {
+            Account original = getAccount(account.getId());
+            correctedBalance = account.getBalance()- original.getBalance();
+        }
+        catch (Exception e) {
+            return -1;
+        }
+        if(correctedBalance !=0) {
+            try {
+                insertTransaction(new Transaction(account.getId() , account.getId() , "updated balance manually", null, null,
+                        new BigDecimal(correctedBalance),
+                        account.getCurrency(), Calendar.getInstance(), getTransactionCategory(TransactionCategory.U_CORRECTION), TransactionType.CORRECTION));
+            } catch (Exception e) {
+                return -1;
+            }
+        }
 
         int count = db.update(
                 ExpenseManagerContract.AccountTable.TABLE_NAME,
                 values,
                 selection,
                 selectionArgs);
+
 
         return count;
     }
@@ -769,7 +899,12 @@ public class ExpenseManagerDAO {
 
         long newRowId;
         newRowId = db.insert(ExpenseManagerContract.AccountTable.TABLE_NAME, null, values);
-
+        if(newRowId != -1)
+        {
+            insertTransaction(new Transaction((int)newRowId,(int)newRowId,"initial Balance",null,null,
+                    new BigDecimal(account.getBalance()),
+                    account.getCurrency(),Calendar.getInstance(),getTransactionCategory(TransactionCategory.U_CORRECTION),TransactionType.CORRECTION ));
+        }
         return newRowId;
 
     }
@@ -903,6 +1038,8 @@ public class ExpenseManagerDAO {
     /* Model to ContentValues */
     private ContentValues getValuesFromTransaction(Transaction transaction) {
         ContentValues values = new ContentValues();
+        values.put(ExpenseManagerContract.TransactionTable.COLUMN_NAME_FOREIGN_KEY_GIVER.getName(),transaction.getGiver());
+        values.put(ExpenseManagerContract.TransactionTable.COLUMN_NAME_FOREIGN_KEY_RECIEVER.getName(),transaction.getTaker());
         values.put(ExpenseManagerContract.TransactionTable.COLUMN_NAME_DESCRIPTION.getName(), transaction.getDescription());
         values.put(ExpenseManagerContract.TransactionTable.COLUMN_NAME_THUMBNAIL.getName(), transaction.getThumbnail());
         values.put(ExpenseManagerContract.TransactionTable.COLUMN_NAME_FULL_IMAGE_PATH.getName(), transaction.getFullImagePath());
@@ -1032,11 +1169,13 @@ public class ExpenseManagerDAO {
 
         int id = cursor.getInt(cursor.getColumnIndex(ExpenseManagerContract.ExpenseTable._ID));
         String description = cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.ExpenseTable.COLUMN_NAME_DESCRIPTION.getName()));
-        byte[] image = cursor.getBlob(cursor.getColumnIndex(ExpenseManagerContract.ExpenseTable.COLUMN_NAME_THUMBNAIL.getName()));
+        byte[] image = cursor.getBlob(Cacursor.getColumnIndex(ExpenseManagerContract.ExpenseTable.COLUMN_NAME_THUMBNAIL.getName()));
         String fullImagePath = cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.ExpenseTable.COLUMN_NAME_FULL_IMAGE_PATH.getName()));
         BigDecimal amount = new BigDecimal(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.ExpenseTable.COLUMN_NAME_AMOUNT.getName())));
-        Currency currency = Currency.valueOf(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.ExpenseTable.COLUMN_NAME_CURRENCY.getName())));
-        Calendar date = Calendar.getInstance();
+        Currency currency = Currency.valueOf-[
+
+        \(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.ExpenseTable.COLUMN_NAME_CURRENCY.getName())));
+        C.alendar date = Calendar.getInstance();
         date.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(ExpenseManagerContract.ExpenseTable.COLUMN_NAME_DATE.getName())));
         ExpenseCategory expenseCategory = ExpenseCategory.valueOf(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.ExpenseTable.COLUMN_NAME_EXPENSE_CATEGORY.getName())));
         ExpenseType expenseType = ExpenseType.valueOf(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.ExpenseTable.COLUMN_NAME_EXPENSE_TYPE.getName())));
@@ -1047,6 +1186,8 @@ public class ExpenseManagerDAO {
     private Transaction getTransactionFromCursor(Cursor cursor) {
 
         int id = cursor.getInt(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable._ID));
+        int giver = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable.COLUMN_NAME_FOREIGN_KEY_GIVER.getName())));
+        int reciver = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable.COLUMN_NAME_FOREIGN_KEY_RECIEVER.getName())));
         String description = cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable.COLUMN_NAME_DESCRIPTION.getName()));
         byte[] image = cursor.getBlob(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable.COLUMN_NAME_THUMBNAIL.getName()));
         String fullImagePath = cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable.COLUMN_NAME_FULL_IMAGE_PATH.getName()));
@@ -1057,7 +1198,7 @@ public class ExpenseManagerDAO {
         TransactionCategory expenseCategory = getTransactionCategory(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_CATEGORY.getName())));
         TransactionType expenseType = TransactionType.valueOf(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_TYPE.getName())));
 
-        return new Transaction(id, description, image, fullImagePath, amount, currency, date, expenseCategory, expenseType);
+        return new Transaction(id,giver,reciver, description, image, fullImagePath, amount, currency, date, expenseCategory, expenseType);
     }
 
 
@@ -1087,5 +1228,27 @@ public class ExpenseManagerDAO {
         date.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(ExpenseManagerContract.PaymentTable.COLUMN_NAME_DATE.getName())));
 
         return new Payment(id, description, amount, currency, date);
+    }
+
+    public List<DailyExpense> getDailyExpenses() {
+        List<DailyExpense> del = new ArrayList<>();
+        for(int i=0;i<31;i++)
+        {
+            del.add(new DailyExpense(Calendar.getInstance(),new BigDecimal(100)));
+        }
+        return del;
+    }
+
+    public List<DailyExpense> getAccumulatedDailyExpenses() {
+        List<DailyExpense> del = new ArrayList<>();
+        for(int i=0;i<31;i++)
+        {
+            del.add(new DailyExpense(Calendar.getInstance(),new BigDecimal(100)));
+        }
+        return del;
+    }
+
+    public int getAccountOrCreate(Editable text) {
+        return Account.CASH_ID;
     }
 }

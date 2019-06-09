@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="5dp"
@@ -27,23 +28,35 @@
             <!--android:src="@drawable/icon_expense"-->
             <!--android:visibility="gone"/>-->
 
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/list_item_account_img_image"
+            android:layout_width="100dp"
+            android:layout_height="80dp"
+            android:layout_centerVertical="true"
+            android:layout_margin="8dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/icon_cash" />
+
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/list_item_acc_nick_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:layout_marginLeft="4dp"
             android:layout_marginStart="4dp"
-            android:textSize="18sp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginTop="2dp"
+            android:layout_toRightOf="@id/list_item_account_img_image"
+            android:text="Nick name"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="@color/gray_700"
-            android:text="Bank account nick name" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/list_item_account_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/list_item_acc_nick_name"
+            android:layout_toRightOf="@id/list_item_account_img_image"
             android:layout_marginLeft="4dp"
             android:layout_marginStart="4dp"
             android:textColor="@color/gray_700"
@@ -56,6 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/list_item_account_number"
+
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginStart="4dp"

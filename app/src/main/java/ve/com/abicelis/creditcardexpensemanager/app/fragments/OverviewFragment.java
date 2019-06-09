@@ -1,46 +1,41 @@
 package ve.com.abicelis.creditcardexpensemanager.app.fragments;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ScrollView;
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import lecho.lib.hellocharts.model.PieChartData;
+import lecho.lib.hellocharts.model.SliceValue;
+import lecho.lib.hellocharts.view.PieChartView;
 import ve.com.abicelis.creditcardexpensemanager.R;
-import ve.com.abicelis.creditcardexpensemanager.app.dialogs.CheckCreditPeriodLimitDialogFragment;
-import ve.com.abicelis.creditcardexpensemanager.app.holders.SelectableAccountViewHolder;
-import ve.com.abicelis.creditcardexpensemanager.app.holders.SelectableCreditCardViewHolder;
-import ve.com.abicelis.creditcardexpensemanager.app.utils.Constants;
-import ve.com.abicelis.creditcardexpensemanager.app.utils.DateUtils;
-import ve.com.abicelis.creditcardexpensemanager.app.utils.SharedPreferencesUtils;
-import ve.com.abicelis.creditcardexpensemanager.app.utils.TextUtils;
+import ve.com.abicelis.creditcardexpensemanager.app.adapters.TransactionAdapter;
+import ve.com.abicelis.creditcardexpensemanager.app.holders.TransactionViewHolder;
 import ve.com.abicelis.creditcardexpensemanager.app.views.HorizontalBar;
 import ve.com.abicelis.creditcardexpensemanager.database.ExpenseManagerDAO;
 import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseCategory;
-import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditCardNotFoundException;
-import ve.com.abicelis.creditcardexpensemanager.exceptions.CreditPeriodNotFoundException;
-import ve.com.abicelis.creditcardexpensemanager.exceptions.SharedPreferenceNotFoundException;
-import ve.com.abicelis.creditcardexpensemanager.model.Account;
-import ve.com.abicelis.creditcardexpensemanager.model.CreditCard;
-import ve.com.abicelis.creditcardexpensemanager.model.DailyExpense;
+import ve.com.abicelis.creditcardexpensemanager.enums.TransactionType;
+import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotDeleteDataException;
+import ve.com.abicelis.creditcardexpensemanager.model.Transaction;
 import ve.com.abicelis.creditcardexpensemanager.model.TransactionCategory;
 
-/**
+/**i
  * Created by abice on 4/10/2016.
  */
 
@@ -50,17 +45,34 @@ public class OverviewFragment extends Fragment {
     private static final String TAG = OverviewFragment.class.getSimpleName();
 
     //DATA
-    int activeCreditCardId = -1;
-    Account activeCreditCard = null;
+    //int activeCreditCardId = -1;
+    //Account activeCreditCard = null;
     ExpenseManagerDAO dao;
 
+    List<Transaction> creditCardExpenses = new ArrayList<>();
+
     //UI
-    SelectableAccountViewHolder holder;
+    RecyclerView recyclerViewExpenses;
+    LinearLayoutManager mLayoutManager;
+    TransactionAdapter mAdapter;
+
+    //UI
+    //SelectableAccountViewHolder holder;
    // View headerCreditCardContainer;
     //HorizontalBar creditDatePeriodBar;
     HorizontalBar creditBalanceBar;
     //TextView extraInfo;
-    ScrollView scrollViewContainer;
+//    ScrollView scrollViewContainer;
+
+    //UI
+    private PieChartView chart;
+    private RelativeLayout mNoExpensesContainer;
+
+    //DATA
+    private boolean chartIsVisible = false;
+    private PieChartData data;
+    private List<TransactionCategory> categories;
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -85,8 +97,18 @@ public class OverviewFragment extends Fragment {
       // creditDatePeriodBar = (HorizontalBar) view.findViewById(R.id.frag_overview_credit_date_period_bar);
         creditBalanceBar = (HorizontalBar) view.findViewById(R.id.frag_overview_credit_balance_bar);
         //extraInfo = (TextView) view.findViewById(R.id.frag_overview_extra_info);
-        scrollViewContainer = (ScrollView) view.findViewById(R.id.frag_overview_body_scroll_view_container);
-
+//        scrollViewContainer = (ScrollView) view.findViewById(R.id.frag_overview_body_scroll_view_container);
+        chart = (PieChartView) view.findViewById(R.id.overview_chart_categories_piechart);
+        mNoExpensesContainer = (RelativeLayout) view.findViewById(R.id.overview_chart_categories_no_expenses_container);
+        recyclerViewExpenses = (RecyclerView) view.findViewById(R.id.overview_recycler_expenses);
+        setUpRecyclerView(view);
+        int count = 1;
+        for(Transaction tc:dao.getTransactionList()) {
+            creditCardExpenses.add(tc);
+            count++;
+            if(count >2)
+                break;
+        }
         refreshUI();
 
         return view;
@@ -100,30 +122,23 @@ public class OverviewFragment extends Fragment {
 
     private void refreshUI() {
         loadDao();
-        try {
-            activeCreditCard = dao.getAccount(activeCreditCardId);
-        }
-        catch (Exception e)
-        {
 
-        }
         //Hide all
-        scrollViewContainer.setVisibility(View.GONE);
+      ///  scrollViewContainer.setVisibility(View.GONE);
      //   headerCreditCardContainer.setVisibility(View.GONE);
 
 
-            try {
 
-                scrollViewContainer.setVisibility(View.VISIBLE);
+         ///       scrollViewContainer.setVisibility(View.VISIBLE);
        //         headerCreditCardContainer.setVisibility(View.VISIBLE);
 
                 /* DatePeriod bar */
-                Calendar today = Calendar.getInstance();
+            //    Calendar today = Calendar.getInstance();
         //        Calendar startDate = activeAccount.getCreditPeriods().get(0).getStartDate();
           //      Calendar endDate = activeAccount.getCreditPeriods().get(0).getEndDate();
                // int daysBetweenStartAndToday = DateUtils.getDaysBetween(startDate, today);
             //    int daysInPeriod = activeAccount.getCreditPeriods().get(0).getTotalDaysInPeriod();
-                int datePeriodPercentage;
+           //     int datePeriodPercentage;
               //  if(daysInPeriod > 0)
                 //    datePeriodPercentage = (int)(100*((float)daysBetweenStartAndToday/daysInPeriod));
                 //else
@@ -134,15 +149,15 @@ public class OverviewFragment extends Fragment {
                 //int creditLimit = activeAccount.getCreditPeriods().get(0).getCreditLimit().toBigInteger().intValue();
                 //int expensesTotal = activeAccount.getCreditPeriods().get(0).getExpensesTotal().toBigInteger().intValue();
                 String currencyCode = "INR";
-                int balancePercentage;
+             //   int balancePercentage;
                 //if(creditLimit > 0)
                   //  balancePercentage = (int)(100*((float)expensesTotal/creditLimit));
                 //else
                   //  balancePercentage = 0;
-                TransactionCategory tc = dao.getTransactionCategory(0);
-                double creditLimit = tc.getBudget();
-                double expensesTotal = tc.getSpent();
-                if(tc.getBudget() > 0) {
+                TransactionCategory tcAll = dao.getTransactionCategory(0);
+                double creditLimit = tcAll.getBudget();
+                double expensesTotal = tcAll.getSpent();
+                if(tcAll.getBudget() > 0) {
                     creditBalanceBar.setProgressPercentage((int) (expensesTotal * 100 / creditLimit));
                     creditBalanceBar.setTextHi(creditLimit + " " + currencyCode);
                     if (expensesTotal > 0)
@@ -155,16 +170,97 @@ public class OverviewFragment extends Fragment {
 
                 //Setup cc data
          //       holder = new SelectableCreditCardViewHolder(headerCreditCardContainer);
-                holder.setData(getContext(), activeCreditCard, 0);
-            }catch (Exception e) {
-                Toast.makeText(getActivity(), "Problem refreshing card data", Toast.LENGTH_SHORT).show();
-                Log.d(TAG, e.getMessage());
-                e.printStackTrace();
-            }
+         //       holder.setData(getContext(), activeCreditCard, 0);
+
+
+        categories = dao.getTransactionCategoryList(TransactionType.EXPENSE);
+
+        //Check if there are no expenses in this period or there is no active credit card
+        if(dao.getTransactionList(TransactionType.EXPENSE).size() ==0) {
+            chart.setVisibility(View.GONE);
+            mNoExpensesContainer.setVisibility(View.VISIBLE);
+            return;
+        }
+        else
+        {
+            chart.setVisibility(View.VISIBLE);
+            mNoExpensesContainer.setVisibility(View.GONE);
+
+        }
+
+        //int numCategories = categories.size();
+        //List<BigDecimal> expenseByCategory = creditPeriod.getExpensesByCategory();
+        List<SliceValue> sliceValues = new ArrayList<>();
+
+
+        for (TransactionCategory tc:categories) {
+            //SliceValue sliceValue = new SliceValue(expenseByCategory[i].floatValue(), ContextCompat.getColor(getContext(), ExpenseCategory.values()[i].getColor() ));
+            SliceValue sliceValue = new SliceValue(20, ContextCompat.getColor(getContext(), ExpenseCategory.values()[tc.getId()%5].getColor() ));
+            sliceValue.setTarget((float)tc.getSpent());
+            sliceValue.setLabel(getExpenseLabel(tc.getSpent(),dao.getBudgetSpendForCurrentMonth(TransactionType.EXPENSE,0),tc.getmName()));
+            sliceValues.add(sliceValue);
+        }
+
+
+        //Setup chart
+        data = new PieChartData(sliceValues);
+        data.setHasLabels(true);
+        //data.setHasLabelsOutside(true);
+        chart.setPieChartData(data);
+
+        chart.startDataAnimation(10000);
+
 
 
     }
+    private void setUpRecyclerView(View rootView) {
 
+
+        TransactionViewHolder.TransactionDeletedListener listener = new TransactionViewHolder.TransactionDeletedListener() {
+            @Override
+            public void OnTransactionDeleted(int position) {
+                try {
+
+                    dao.deleteTransaction(creditCardExpenses.get(position).getId());
+                    creditCardExpenses.remove(position);
+                    mAdapter.notifyItemRemoved(position);
+                    mAdapter.notifyItemRangeChanged(position, mAdapter.getItemCount());
+                    //refreshChart();
+                }catch (CouldNotDeleteDataException e) {
+                    Toast.makeText(getActivity(), "There was an error deleting the expense!", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        };
+        mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        mAdapter = new TransactionAdapter(this, creditCardExpenses, 0, listener);
+
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(recyclerViewExpenses.getContext(), mLayoutManager.getOrientation());
+        itemDecoration.setDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.item_decoration_half_line));
+
+
+        recyclerViewExpenses.addItemDecoration(itemDecoration);
+        recyclerViewExpenses.setLayoutManager(mLayoutManager);
+
+        recyclerViewExpenses.setAdapter(mAdapter);
+    }
+    private String getExpenseLabel(double expenseValue,double total, String expenseName) {
+        BigDecimal expenseTotal;
+        BigDecimal aux;
+        expenseTotal = new BigDecimal(expenseValue);
+        BigDecimal totalBig = new BigDecimal(total);
+        if(total!=0.0) {
+            if(expenseValue!=0.0) {
+                aux = expenseTotal.divide(totalBig, 3, RoundingMode.CEILING);
+                aux = aux.multiply(new BigDecimal(100));
+                return String.format(Locale.getDefault(), "%1$s %2$s%%", expenseName, new DecimalFormat("#0.#").format(aux));
+            }
+        }
+
+        return "";
+    }
+
+/*
     private String generateExtraInfo() {
 
 //        <string name="fragment_overview_credit_extra_info_spendiest_day">The spendiest day in this period is %1$s, you spent %2$s on $3$s.</string>
@@ -187,7 +283,7 @@ public class OverviewFragment extends Fragment {
                 maxDailyExpense = de.getAmount();
                 maxDailyExpenseDate = de.getFormattedDate();
             }
-        }*/
+        }*
 
         if(maxDailyExpenseDate != null)
             extraInfos.add(String.format(Locale.getDefault(), info1, maxDailyExpenseDate, maxDailyExpense.toBigInteger().toString(), activeCreditCard.getCurrency().getCode()));
@@ -197,13 +293,13 @@ public class OverviewFragment extends Fragment {
 
 
         /*List<BigDecimal> expensesByCategory = activeAccount.getCreditPeriods().get(0).getExpensesByCategory();
-        BigDecimal expenseTotal = activeAccount.getCreditPeriods().get(0).getExpensesTotal();*/
+        BigDecimal expenseTotal = activeAccount.getCreditPeriods().get(0).getExpensesTotal();*
         BigDecimal maxCategory = new BigDecimal(0);
         String maxCategoryName = "";
 
 
 
-  /*      if(expenseTotal.compareTo(BigDecimal.ZERO) == 1) {
+  *      if(expenseTotal.compareTo(BigDecimal.ZERO) == 1) {
 
             for(int i = 0; i < ExpenseCategory.values().length; i++) {
                 if(expensesByCategory.get(i).compareTo(maxCategory) == 1) {  //If current larger than max
@@ -217,7 +313,7 @@ public class OverviewFragment extends Fragment {
             extraInfos.add(String.format(Locale.getDefault(), info2, maxCategoryName,  percentOfTotalMaxCategory.toBigInteger().toString()));
         }
 
-*/
+*
 
         Calendar today = Calendar.getInstance();
         //Calendar startDate = activeAccount.getCreditPeriods().get(0).getStartDate();
@@ -227,7 +323,7 @@ public class OverviewFragment extends Fragment {
         //BigDecimal expensesTotal = activeAccount.getCreditPeriods().get(0).getExpensesTotal();
         //BigDecimal creditLimit = activeAccount.getCreditPeriods().get(0).getCreditLimit();
         //BigDecimal creditToSpend = creditLimit.subtract(expensesTotal);
-        String currencyCode = activeCreditCard.getCurrency().getCode();
+ //       String currencyCode = activeCreditCard.getCurrency().getCode();
 /*
         if(expensesTotal.compareTo(BigDecimal.ZERO) == 1 && daysBetweenStartAndToday > 0) {
             BigDecimal average = expensesTotal.divide(new BigDecimal(daysBetweenStartAndToday), 1, RoundingMode.HALF_UP);
@@ -242,7 +338,7 @@ public class OverviewFragment extends Fragment {
             extraInfos.add(String.format(Locale.getDefault(), info4, creditToSpend.toPlainString(), averageToSpend.toPlainString(), currencyCode));
         }
 
-*/
+*
 
 
 
@@ -256,7 +352,7 @@ public class OverviewFragment extends Fragment {
         return result;
     }
 
-
+*
     private void createACurrentCreditPeriod() {
         //If there is no current credit period, create one
 
@@ -288,6 +384,6 @@ public class OverviewFragment extends Fragment {
             Toast.makeText(getActivity(), "Error getting credit card data", Toast.LENGTH_SHORT).show();
         }
 
-    }
+    }*/
 
 }

@@ -17,10 +17,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -43,6 +45,7 @@ import ve.com.abicelis.creditcardexpensemanager.database.ExpenseManagerDAO;
 import ve.com.abicelis.creditcardexpensemanager.enums.TransactionType;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotInsertDataException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotUpdateDataException;
+import ve.com.abicelis.creditcardexpensemanager.model.Transaction;
 import ve.com.abicelis.creditcardexpensemanager.model.TransactionCategory;
 
 /**
@@ -66,6 +69,7 @@ public class CreateOrEditCategoryDialogFragment extends AppCompatDialogFragment 
     //UI
     private DialogInterface.OnDismissListener mOnDismissListener;
     private EditText mAmountText;
+    private TextView mAmountTextLabel;
     private EditText mDescriptionText;
     //private Spinner mExpenseCategory;
     private Spinner mExpenseType;
@@ -138,6 +142,7 @@ public class CreateOrEditCategoryDialogFragment extends AppCompatDialogFragment 
         //}
 
         // Get fields from view
+        mAmountTextLabel = (TextView) view.findViewById(R.id.dialog_create_bugdet_label_amount);
         mAmountText = (EditText) view.findViewById(R.id.dialog_create_category_budget);
         mDescriptionText = (EditText) view.findViewById(R.id.dialog_create_category_name);
         //mExpenseCategory = (Spinner) view.findViewById(R.id.dialog_create_expense_category);
@@ -163,9 +168,32 @@ public class CreateOrEditCategoryDialogFragment extends AppCompatDialogFragment 
         //mExpenseCategory.setAdapter(expenseCategoryAdapter);
 
         expenseTypes = new ArrayList<>(Arrays.asList(TransactionType.values()));
+        expenseTypes.remove(expenseTypes.indexOf(TransactionType.CORRECTION));
         ArrayAdapter expenseTypeAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, expenseTypes);
         expenseTypeAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         mExpenseType.setAdapter(expenseTypeAdapter);
+
+        mExpenseType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                if(position== expenseTypes.indexOf(TransactionType.EXPENSE))
+                {
+                    mAmountTextLabel.setVisibility(View.VISIBLE);
+                    mAmountText.setVisibility(View.VISIBLE);
+                    //mAmountText.setText(String.valueOf(mOriginalExpense.getBudget()));
+                }
+                else {
+                    mAmountTextLabel.setVisibility(View.INVISIBLE);
+                    mAmountText.setVisibility(View.INVISIBLE);
+                }
+               }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
+        });
 
         //If editing an existing expense, set its values
         if(mOriginalExpense != null)
@@ -177,10 +205,18 @@ public class CreateOrEditCategoryDialogFragment extends AppCompatDialogFragment 
     }
 
     private void setOriginalExpenseValues() {
-        mAmountText.setText(String.valueOf(mOriginalExpense.getBudget()));
-        mDescriptionText.setText(mOriginalExpense.getName());
+
+        mDescriptionText.setText(mOriginalExpense.getmName());
     //    mExpenseCategory.setSelection(expenseCategories.indexOf(mOriginalExpense.getExpenseCategory()));
         mExpenseType.setSelection(expenseTypes.indexOf(mOriginalExpense.getType()));
+        if(mOriginalExpense.getType() == TransactionType.EXPENSE)
+        {
+            mAmountText.setText(String.valueOf(mOriginalExpense.getBudget()));
+        }
+        else {
+            mAmountTextLabel.setVisibility(View.INVISIBLE);
+            mAmountText.setVisibility(View.INVISIBLE);
+        }
         mCreateButton.setText(R.string.dialog_create_expense_button_edit);
         getDialog().setTitle("Edit Category");
 
@@ -369,13 +405,13 @@ public class CreateOrEditCategoryDialogFragment extends AppCompatDialogFragment 
         }
         catch (Exception e)
         {
-
+            if( !amount.equals("")) {
+                Toast.makeText(getContext(), getResources().getString(R.string.dialog_create_expense_error_bad_amount), Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
         String description = mDescriptionText.getText().toString();
-        if(amount.equals("") || new BigDecimal(amount).compareTo(new BigDecimal(0)) == 0) {
-            Toast.makeText(getContext(), getResources().getString(R.string.dialog_create_expense_error_bad_amount), Toast.LENGTH_SHORT).show();
-            return;
-        }
+
 
         //TransactionCategory expenseCategory = expenseCategories.get(mExpenseCategory.getSelectedItemPosition());
         TransactionType expenseType = expenseTypes.get(mExpenseType.getSelectedItemPosition());

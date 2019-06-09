@@ -68,7 +68,7 @@ public class TransactionViewHolder extends RecyclerView.ViewHolder implements Vi
         this.mDescription.setText(current.getDescription());
         this.mDate.setText(DateUtils.getRelativeTimeSpanString(current.getDate()));
 
-        this.mCategory.setText(current.getTransactionCategory().getName());
+        this.mCategory.setText(current.getTransactionCategory().getmName());
        // ((GradientDrawable)this.mCategory.getBackground()).setColor(ContextCompat.getColor(mFragment.getContext(), current.getTransactionCategory().getColor()));
 
         this.mType.setText(current.getTransactionType().getCode());

@@ -62,6 +62,7 @@ import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseCategory;
 import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseType;
 import ve.com.abicelis.creditcardexpensemanager.enums.TransactionType;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotInsertDataException;
+import ve.com.abicelis.creditcardexpensemanager.model.Account;
 import ve.com.abicelis.creditcardexpensemanager.model.Transaction;
 import ve.com.abicelis.creditcardexpensemanager.model.TransactionCategory;
 import ve.com.abicelis.creditcardexpensemanager.ocr.OcrDetectorProcessor;
@@ -240,6 +241,7 @@ public final class OcrCreateExpenseActivity extends AppCompatActivity implements
 
 
         expenseTypes = new ArrayList<>(Arrays.asList(TransactionType.values()));
+        expenseTypes.remove(expenseTypes.indexOf(TransactionType.CORRECTION));
         ArrayAdapter expenseTypeAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, expenseTypes);
         expenseTypeAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         mExpenseType.setAdapter(expenseTypeAdapter);
@@ -671,7 +673,7 @@ public final class OcrCreateExpenseActivity extends AppCompatActivity implements
 //        } else {
             //Otherwise, insert a new expense
             try {
-                Transaction expense = new Transaction(description, null, null, new BigDecimal(amount),
+                Transaction expense = new Transaction(Account.CASH_ID,Account.CASH_ID,description, null, null, new BigDecimal(amount),
                         mCurrency, Calendar.getInstance(), expenseCategory, expenseType);
                 mDao.insertTransaction( expense);
             } catch (CouldNotInsertDataException e) {

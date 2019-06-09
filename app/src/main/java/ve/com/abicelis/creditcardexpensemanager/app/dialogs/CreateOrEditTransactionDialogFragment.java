@@ -48,6 +48,7 @@ import java.util.List;
 
 import ve.com.abicelis.creditcardexpensemanager.R;
 import ve.com.abicelis.creditcardexpensemanager.app.activities.ImageCropperActivity;
+import ve.com.abicelis.creditcardexpensemanager.app.adapters.AccountAdapter;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.ImageUtils;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.NumberInputFilter;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.PermissionUtils;
@@ -56,6 +57,7 @@ import ve.com.abicelis.creditcardexpensemanager.enums.Currency;
 import ve.com.abicelis.creditcardexpensemanager.enums.TransactionType;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotInsertDataException;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotUpdateDataException;
+import ve.com.abicelis.creditcardexpensemanager.model.Account;
 import ve.com.abicelis.creditcardexpensemanager.model.Transaction;
 import ve.com.abicelis.creditcardexpensemanager.model.TransactionCategory;
 
@@ -81,6 +83,8 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
     private DialogInterface.OnDismissListener mOnDismissListener;
     private EditText mAmountText;
     private EditText mDescriptionText;
+    private Spinner mGiver;
+    private EditText mReciver;
     private Spinner mExpenseCategory;
     private Spinner mExpenseType;
     private Button mCancelButton;
@@ -95,6 +99,7 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
     byte[] expenseImageThumbnailBytes;
     List<TransactionCategory> expenseCategories;
     List<TransactionType> expenseTypes;
+    List<Account> accounts;
 
     private Uri imageUri;
     private String imagePath = null;
@@ -140,7 +145,6 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getDialog().setTitle(R.string.dialog_create_expense_title);
-
         // Fetch arguments from bundle and set title
         mCurrency = (Currency) getArguments().getSerializable(TAG_ARGS_CURRENCY);
         mOriginalExpense = (Transaction) getArguments().getSerializable(TAG_ARGS_ORIGINAL_TRANSACTION);
@@ -150,12 +154,15 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
          //   Toast.makeText(getActivity(), "Error, wrong arguments passed. Dismissing dialog.", Toast.LENGTH_SHORT).show();
          //   dismiss();
         //}
+        accounts = mDao.getAccountList();
 
         // Get fields from view
         mAmountText = (EditText) view.findViewById(R.id.dialog_create_expense_amount);
         mDescriptionText = (EditText) view.findViewById(R.id.dialog_create_expense_description);
         mExpenseCategory = (Spinner) view.findViewById(R.id.dialog_create_expense_category);
         mExpenseType = (Spinner) view.findViewById(R.id.dialog_create_expense_type);
+        mGiver = (Spinner) view.findViewById(R.id.dialog_create_expense_giver);
+        mReciver = (EditText) view.findViewById(R.id.dialog_create_expense_to);
         mCancelButton = (Button) view.findViewById(R.id.dialog_create_expense_button_cancel);
         mCreateButton = (Button) view.findViewById(R.id.dialog_create_expense_button_create);
         mImage = (ImageView) view.findViewById(R.id.dialog_create_expense_image);
@@ -191,6 +198,11 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
             }
 
         });
+
+        ArrayAdapter adp = new ArrayAdapter(getContext(),R.layout.spinner_item, accounts);
+        adp.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        mGiver.setAdapter(adp);
+
         //If editing an existing expense, set its values
         if(mOriginalExpense != null) {
             expenseCategories = mDao.getTransactionCategoryList(mOriginalExpense.getTransactionType());
@@ -209,9 +221,18 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
     }
 
     private void setOriginalExpenseValues() {
+        int index=0;
+        for(Account acc:accounts) {
+            if(acc.getId()==mOriginalExpense.getGiver())
+            mGiver.setSelection(index);
+            if(acc.getId() == mOriginalExpense.getTaker())
+            {
+                mReciver.setText(acc.getNickName());
+            }
+        }
         mAmountText.setText(mOriginalExpense.getAmount().toPlainString());
         mDescriptionText.setText(mOriginalExpense.getDescription());
-        int index=0;
+        index=0;
         for(TransactionCategory tc:expenseCategories) {
             if (mOriginalExpense.getTransactionCategory().getId() == tc.getId()) {
                 mExpenseCategory.setSelection(index);
@@ -471,6 +492,8 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
 
 
     private void handleNewExpenseCreation() {
+        int iGiver=0;
+        int iTaker =0;
 
         String amount = mAmountText.getText().toString();
         String description = mDescriptionText.getText().toString();
@@ -481,7 +504,8 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
 
         TransactionCategory expenseCategory = expenseCategories.get(mExpenseCategory.getSelectedItemPosition());
         TransactionType expenseType = expenseTypes.get(mExpenseType.getSelectedItemPosition());
-
+        iGiver = accounts.get(mGiver.getSelectedItemPosition()).getId();
+        iTaker = mDao.getAccountOrCreate(mReciver.getText());
         //If a temp photo was ever taken, copy tempFile to photoFile, then delete tempFile!
         if(tempImagePath != null) {
             File expensesDir = getExpensesDir();
@@ -519,7 +543,7 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
         //If editing an expense, update it
         if(mOriginalExpense != null) {
             try {
-                Transaction expense = new Transaction(mOriginalExpense.getId(), description, expenseImageThumbnailBytes, imagePath,
+                Transaction expense = new Transaction(mOriginalExpense.getId(),iGiver,iTaker, description, expenseImageThumbnailBytes, imagePath,
                         new BigDecimal(mAmountText.getText().toString()), mCurrency,
                         mOriginalExpense.getDate(), expenseCategory, expenseType);
                 mDao.updateTransaction(expense);
@@ -529,7 +553,7 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
         } else {
             //Otherwise, insert a new expense
             try {
-                Transaction expense = new Transaction(description, expenseImageThumbnailBytes, imagePath,
+                Transaction expense = new Transaction(iGiver,iTaker,description, expenseImageThumbnailBytes, imagePath,
                         new BigDecimal(mAmountText.getText().toString()), mCurrency,
                         Calendar.getInstance(), expenseCategory, expenseType);
                 mDao.insertTransaction(expense);

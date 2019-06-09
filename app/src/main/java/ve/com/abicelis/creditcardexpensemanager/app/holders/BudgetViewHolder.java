@@ -14,7 +14,8 @@ import android.widget.TextView;
 
 import ve.com.abicelis.creditcardexpensemanager.R;
 import ve.com.abicelis.creditcardexpensemanager.app.activities.CategoryDetailActivity;
-import ve.com.abicelis.creditcardexpensemanager.app.adapters.CategoryAdapter;
+import ve.com.abicelis.creditcardexpensemanager.app.adapters.BudgetAdapter;
+//import ve.com.abicelis.creditcardexpensemanager.app.adapters.CategoryAdapter;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.Constants;
 import ve.com.abicelis.creditcardexpensemanager.app.views.HorizontalBar;
 import ve.com.abicelis.creditcardexpensemanager.model.TransactionCategory;
@@ -22,18 +23,18 @@ import ve.com.abicelis.creditcardexpensemanager.model.TransactionCategory;
 /**
  * Created by Alex on 7/8/2016.
  */
-public class CategoryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+public class BudgetViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
-    public CategoryAdapter mAdapter;
+    public BudgetAdapter mAdapter;
     private Fragment mFragment;
     private CategoryDeletedListener mListener = null;
 
     //UI
     private RelativeLayout mContainer;
-   // private TextView mBudget;
-    //private TextView mSpent;
+    private TextView mBudget;
+    private TextView mSpent;
     private TextView mCategoryName;
-   /// HorizontalBar creditBalanceBar;
+    HorizontalBar creditBalanceBar;
 
     //private TextView mDate;
     private ImageView mImage;
@@ -46,31 +47,31 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder implements View.
     //private int mCreditPeriodId;
     private int mCategoryPosition;
 
-    public CategoryViewHolder(View itemView) {
+    public BudgetViewHolder(View itemView) {
         super(itemView);
 
-        mContainer = (RelativeLayout) itemView.findViewById(R.id.list_item_categories_container);
-     //   mBudget = (TextView) itemView.findViewById(R.id.list_item_category_budget);
-       // mSpent = (TextView) itemView.findViewById(R.id.list_item_category_spent);
-        mCategoryName = (TextView) itemView.findViewById(R.id.list_item_category_name);
+        mContainer = (RelativeLayout) itemView.findViewById(R.id.list_item_budgets_container);
+        mBudget = (TextView) itemView.findViewById(R.id.list_item_budget_budget);
+        mSpent = (TextView) itemView.findViewById(R.id.list_item_budget_spent);
+        mCategoryName = (TextView) itemView.findViewById(R.id.list_item_budget_name);
         //mDate = (TextView) itemView.findViewById(R.id.list_item_expenses_txt_date);
-        mImage = (ImageView) itemView.findViewById(R.id.list_item_category_img_image);
-        //mCategory = (TextView) itemView.findViewById(R.id.list_item_expenses_txt_category);
-        mType = (TextView) itemView.findViewById(R.id.list_item_category_transaction_type);
-        mDeleteIcon = (ImageView) itemView.findViewById(R.id.list_item_category_img_delete);
-     //   creditBalanceBar = (HorizontalBar) itemView.findViewById(R.id.frag_category_buget_bar);
+        mImage = (ImageView) itemView.findViewById(R.id.list_item_budget_img_image);
+        //mCategory = (TextView) itemView.findViewById(R.id.list_item_expenses_txt_budget);
+        mType = (TextView) itemView.findViewById(R.id.list_item_budget_transaction_type);
+        mDeleteIcon = (ImageView) itemView.findViewById(R.id.list_item_budget_img_delete);
+        creditBalanceBar = (HorizontalBar) itemView.findViewById(R.id.frag_budget_buget_bar);
 
     }
 
-    public void setData(CategoryAdapter adapter, Fragment fragment, TransactionCategory current, int position) {
+    public void setData(BudgetAdapter adapter, Fragment fragment, TransactionCategory current, int position) {
         mAdapter = adapter;
         mFragment = fragment;
         this.mCurrent = current;
       //  mCreditPeriodId = creditPeriodId;
         this.mCategoryPosition = position;
 
-      //  this.mBudget.setText(String.valueOf(current.getBudget()));
-      //  this.mSpent.setText(String.valueOf(current.getSpent()));
+        this.mBudget.setText(String.valueOf(current.getBudget()));
+        this.mSpent.setText(String.valueOf(current.getSpent()));
         this.mCategoryName.setText(current.getmName());
         //this.mDate.setText(DateUtils.getRelativeTimeSpanString(current.getDate()));
 
@@ -78,6 +79,15 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder implements View.
         //((GradientDrawable)this.mCategory.getBackground()).setColor(ContextCompat.getColor(mFragment.getContext(), current.getExpenseCategory().getColor()));
 
         this.mType.setText(current.getType().getCode());
+        if(current.getBudget()>0) {
+            creditBalanceBar.setProgressPercentage((int) ((current.getSpent() * 100.0) / current.getBudget()));
+            creditBalanceBar.setTextHi(current.getBudget() + "");
+            if (current.getSpent() > 0)
+                creditBalanceBar.setTextBar(current.getSpent() + "");
+            creditBalanceBar.setTextLo("0 ");
+        }
+        else
+            creditBalanceBar.setVisibility(View.INVISIBLE);
 
         // ((GradientDrawable)this.mType.getBackground()).setColor(ContextCompat.getColor(mFragment.getContext(), current.getExpenseType().getColor()));
 
@@ -105,6 +115,7 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder implements View.
         int id = view.getId();
         switch (id) {
             case R.id.list_item_categories_container:
+            case R.id.list_item_budgets_container:
                 Pair[] pairs = new Pair[1];
                 pairs[0] = new Pair<View, String>(mImage, mFragment.getResources().getString(R.string.transition_name_expense_detail_image));
                 //pairs[1] = new Pair<View, String>(mBudget,  mActivity.getResources().getString(R.string.transition_name_expense_detail_amount));
@@ -119,7 +130,7 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder implements View.
 
                 break;
 
-            case R.id.list_item_category_img_delete:
+            case R.id.list_item_budget_img_delete:
 
                 DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {

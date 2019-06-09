@@ -46,7 +46,7 @@ import ve.com.abicelis.creditcardexpensemanager.model.Transaction;
 public class ExpenseListFragment extends Fragment {
 
     //Data
-    int activeCreditCardId = -1;
+    int activeCreditCardId = 0;
     Account activeAccount = null;
     List<Transaction> creditCardExpenses = new ArrayList<>();
     ExpenseManagerDAO mDao;

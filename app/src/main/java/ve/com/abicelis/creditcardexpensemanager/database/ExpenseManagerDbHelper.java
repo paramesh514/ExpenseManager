@@ -14,6 +14,7 @@ import java.util.Calendar;
 import ve.com.abicelis.creditcardexpensemanager.app.utils.FileUtils;
 import ve.com.abicelis.creditcardexpensemanager.enums.AccountType;
 import ve.com.abicelis.creditcardexpensemanager.enums.TransactionType;
+import ve.com.abicelis.creditcardexpensemanager.model.Account;
 
 
 /**
@@ -267,7 +268,7 @@ public class ExpenseManagerDbHelper extends SQLiteOpenHelper {
                 ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_TYPE.getName() + COMMA_SEP +
                 ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE.getName()+ COMMA_SEP +
                 ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE_UPDATE.getName()  +
-                ") VALUES (0, 'Cash', 'Cash', '1', 'INR', '"+AccountType.Cash+"',0.0,"+Calendar.getInstance().getTimeInMillis()+ "); ";
+                ") VALUES ('"+ Account.CASH_ID+"', 'Cash', 'Cash', '1', 'INR', '"+AccountType.Cash+"',0.0,"+Calendar.getInstance().getTimeInMillis()+ "); ";
         sqLiteDatabase.execSQL(statement);
 //creating all expense account
         statement = "INSERT INTO " + ExpenseManagerContract.TransactionCategoryTable.TABLE_NAME + " (" +
@@ -308,12 +309,45 @@ public class ExpenseManagerDbHelper extends SQLiteOpenHelper {
                 ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_DESCRIPTION.getName() + COMMA_SEP +
                 ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRASACTION_TYPE.getName() + COMMA_SEP +
                 ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_BUDGET.getName() +
-                ") VALUES (4, 'UnCategorized','"+ TransactionType.CORRECTION.getCode() +"',0.0); ";
+                ") VALUES (4, 'Correction','"+ TransactionType.CORRECTION.getCode() +"',0.0); ";
         sqLiteDatabase.execSQL(statement);
+
+        insertDefaultCategories(sqLiteDatabase);
 
 
     }
+private void insertDefaultCategories(SQLiteDatabase sqLiteDatabase)
+{
+    String statement;
+    statement = "INSERT INTO " + ExpenseManagerContract.TransactionCategoryTable.TABLE_NAME + " (" +
+            ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_DESCRIPTION.getName() + COMMA_SEP +
+            ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRASACTION_TYPE.getName() + COMMA_SEP +
+            ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_BUDGET.getName() +
+            ") VALUES ( 'Food','"+ TransactionType.EXPENSE.getCode() +"',0.0); ";
+    sqLiteDatabase.execSQL(statement);
 
+    statement = "INSERT INTO " + ExpenseManagerContract.TransactionCategoryTable.TABLE_NAME + " (" +
+            ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_DESCRIPTION.getName() + COMMA_SEP +
+            ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRASACTION_TYPE.getName() + COMMA_SEP +
+            ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_BUDGET.getName() +
+            ") VALUES ( 'Bills','"+ TransactionType.EXPENSE.getCode() +"',0.0); ";
+    sqLiteDatabase.execSQL(statement);
+
+    statement = "INSERT INTO " + ExpenseManagerContract.TransactionCategoryTable.TABLE_NAME + " (" +
+            ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_DESCRIPTION.getName() + COMMA_SEP +
+            ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRASACTION_TYPE.getName() + COMMA_SEP +
+            ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_BUDGET.getName() +
+            ") VALUES ( 'Misc','"+ TransactionType.EXPENSE.getCode() +"',0.0); ";
+    sqLiteDatabase.execSQL(statement);
+
+    statement = "INSERT INTO " + ExpenseManagerContract.TransactionCategoryTable.TABLE_NAME + " (" +
+            ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_DESCRIPTION.getName() + COMMA_SEP +
+            ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRASACTION_TYPE.getName() + COMMA_SEP +
+            ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_BUDGET.getName() +
+            ") VALUES ( 'Travel','"+ TransactionType.EXPENSE.getCode() +"',0.0); ";
+    sqLiteDatabase.execSQL(statement);
+
+}
     private void deleteDatabase(SQLiteDatabase sqLiteDatabase) {
         String statement ;
 

@@ -108,7 +108,7 @@ public class CategoryDetailActivity extends AppCompatActivity implements  View.O
 
     private void setUpCategoryDetails() {
         mAmount.setText(String.valueOf(transactionCategory.getBudget()));
-        mDescription.setText(transactionCategory.getName());
+        mDescription.setText(transactionCategory.getmName());
         //mDate.setText(DateUtils.getShortDateString(transactionCategory.getDate()) + "\r\n" + DateUtils.getRelativeTimeSpanString(transactionCategory.getDate()));
 
         //this.mCategory.setText(transactionCategory.getExpenseCategory().getName());
