@@ -236,7 +236,7 @@ public class CreditPeriod {
         cal.setTimeInMillis(startDate.getTimeInMillis());
 
         for (int i = 0; i < getTotalDaysInPeriod(); i++) {
-            dailyExpenses.add(i, new DailyExpense(cal, new BigDecimal(0)));
+            dailyExpenses.add(i, new DailyExpense(cal, new BigDecimal(0),new BigDecimal(0)));
 
             cal.add(Calendar.DAY_OF_MONTH, 1);
         }
@@ -262,7 +262,7 @@ public class CreditPeriod {
 
             accumulatedExpenses = accumulatedExpenses.add(dailyAccumulatedExpenses.get(i).getAmount());
             dailyAccumulatedExpenses.remove(i);
-            dailyAccumulatedExpenses.add(i, new DailyExpense(cal, accumulatedExpenses));
+            dailyAccumulatedExpenses.add(i, new DailyExpense(cal, accumulatedExpenses,new BigDecimal(0)));
 
             cal.add(Calendar.DAY_OF_MONTH, 1);
         }

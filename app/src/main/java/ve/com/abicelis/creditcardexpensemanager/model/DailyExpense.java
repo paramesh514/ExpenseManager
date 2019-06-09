@@ -11,10 +11,10 @@ public class DailyExpense {
 
     Calendar date;
     BigDecimal amount;
-
-    public DailyExpense (Calendar date, BigDecimal amount) {
+    BigDecimal accumulated;
+    public DailyExpense (Calendar date, BigDecimal amount,BigDecimal accumulated) {
         this.amount = amount;
-
+        this.accumulated = accumulated;
         this.date = Calendar.getInstance();
         this.date.setTimeZone(date.getTimeZone());
         this.date.setTimeInMillis(date.getTimeInMillis());
@@ -38,5 +38,12 @@ public class DailyExpense {
         return formattedDate;
     }
 
+    public BigDecimal getAccumulated() {
+        return accumulated;
+    }
+
+    public void setAccumulated(BigDecimal accumulated) {
+        this.accumulated = accumulated;
+    }
 }
 

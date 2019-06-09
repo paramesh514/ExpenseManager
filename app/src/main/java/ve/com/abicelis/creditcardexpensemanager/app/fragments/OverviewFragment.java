@@ -1,8 +1,11 @@
 package ve.com.abicelis.creditcardexpensemanager.app.fragments;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -13,6 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -25,10 +31,13 @@ import lecho.lib.hellocharts.model.PieChartData;
 import lecho.lib.hellocharts.model.SliceValue;
 import lecho.lib.hellocharts.view.PieChartView;
 import ve.com.abicelis.creditcardexpensemanager.R;
+import ve.com.abicelis.creditcardexpensemanager.app.activities.OcrCreateExpenseActivity;
 import ve.com.abicelis.creditcardexpensemanager.app.adapters.TransactionAdapter;
+import ve.com.abicelis.creditcardexpensemanager.app.dialogs.CreateOrEditTransactionDialogFragment;
 import ve.com.abicelis.creditcardexpensemanager.app.holders.TransactionViewHolder;
 import ve.com.abicelis.creditcardexpensemanager.app.views.HorizontalBar;
 import ve.com.abicelis.creditcardexpensemanager.database.ExpenseManagerDAO;
+import ve.com.abicelis.creditcardexpensemanager.enums.Currency;
 import ve.com.abicelis.creditcardexpensemanager.enums.ExpenseCategory;
 import ve.com.abicelis.creditcardexpensemanager.enums.TransactionType;
 import ve.com.abicelis.creditcardexpensemanager.exceptions.CouldNotDeleteDataException;
@@ -55,6 +64,9 @@ public class OverviewFragment extends Fragment {
     RecyclerView recyclerViewExpenses;
     LinearLayoutManager mLayoutManager;
     TransactionAdapter mAdapter;
+    FloatingActionMenu fabMenu;
+    FloatingActionButton fabNewExpense;
+    FloatingActionButton fabNewExpenseCamera;
 
     //UI
     //SelectableAccountViewHolder holder;
@@ -101,14 +113,13 @@ public class OverviewFragment extends Fragment {
         chart = (PieChartView) view.findViewById(R.id.overview_chart_categories_piechart);
         mNoExpensesContainer = (RelativeLayout) view.findViewById(R.id.overview_chart_categories_no_expenses_container);
         recyclerViewExpenses = (RecyclerView) view.findViewById(R.id.overview_recycler_expenses);
+        fabMenu = (FloatingActionMenu) view.findViewById(R.id.overview_fab_menu);
+        fabNewExpense = (FloatingActionButton) view.findViewById(R.id.home_fab_new_cash_income);
+        fabNewExpenseCamera = (FloatingActionButton) view.findViewById(R.id.home_fab_new_cash_expense);
+
         setUpRecyclerView(view);
-        int count = 1;
-        for(Transaction tc:dao.getTransactionList()) {
-            creditCardExpenses.add(tc);
-            count++;
-            if(count >2)
-                break;
-        }
+        setUpFab(view);
+
         refreshUI();
 
         return view;
@@ -119,6 +130,43 @@ public class OverviewFragment extends Fragment {
             dao = new ExpenseManagerDAO(getActivity().getApplicationContext());
     }
 
+    private void setUpFab(View rootView) {
+        fabMenu.setClosedOnTouchOutside(true);
+
+
+        fabNewExpense.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fabMenu.close(true);
+                showCreateExpenseDialog();
+            }
+        });
+        fabNewExpenseCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fabMenu.close(true);
+                showCreateExpenseDialog();
+            }
+        });
+
+    }
+    private void showCreateExpenseDialog() {
+        FragmentManager fm = getFragmentManager();
+        CreateOrEditTransactionDialogFragment dialog = CreateOrEditTransactionDialogFragment.newInstance(
+                dao,
+                Currency.INR,
+                null);
+
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                refreshUI();
+                //refreshRecyclerView();
+                //refreshChart();
+            }
+        });
+        dialog.show(fm, "fragment_dialog_create_transaction");
+    }
 
     private void refreshUI() {
         loadDao();
@@ -210,9 +258,39 @@ public class OverviewFragment extends Fragment {
 
         chart.startDataAnimation(10000);
 
+        refreshRecyclerView();
 
 
     }
+    public void refreshRecyclerView() {
+
+        loadDao();
+
+        int oldExpensesCount = creditCardExpenses.size();
+
+        creditCardExpenses.clear();
+        int count = 1;
+        for(Transaction tc:dao.getTransactionList()) {
+            creditCardExpenses.add(tc);
+            count++;
+            if(count >2)
+                break;
+        }
+        int newExpensesCount = creditCardExpenses.size();
+
+        //TODO: in the future, expenses wont necessarily be added with date=now,
+        //TODO: meaning they wont always be added on recyclerview position = 0
+        //If a new expense was added
+        if(newExpensesCount == oldExpensesCount+1) {
+            mAdapter.notifyItemInserted(0);
+            //      mAdapter.notifyItemRangeChanged(1, activeAccount.getCreditPeriods().get(0).getExpenses().size()-1);
+            mLayoutManager.scrollToPosition(0);
+        } else {
+            mAdapter.notifyDataSetChanged();
+        }
+
+    }
+
     private void setUpRecyclerView(View rootView) {
 
 
@@ -225,6 +303,7 @@ public class OverviewFragment extends Fragment {
                     creditCardExpenses.remove(position);
                     mAdapter.notifyItemRemoved(position);
                     mAdapter.notifyItemRangeChanged(position, mAdapter.getItemCount());
+                    refreshUI();
                     //refreshChart();
                 }catch (CouldNotDeleteDataException e) {
                     Toast.makeText(getActivity(), "There was an error deleting the expense!", Toast.LENGTH_SHORT).show();

@@ -99,8 +99,8 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
     byte[] expenseImageThumbnailBytes;
     List<TransactionCategory> expenseCategories;
     List<TransactionType> expenseTypes;
-    List<Account> accounts;
-
+    List<Account> accounts = new ArrayList<>();
+    List<Account> accountsAll = new ArrayList<>();
     private Uri imageUri;
     private String imagePath = null;
     private String tempImagePath = null;
@@ -154,8 +154,8 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
          //   Toast.makeText(getActivity(), "Error, wrong arguments passed. Dismissing dialog.", Toast.LENGTH_SHORT).show();
          //   dismiss();
         //}
-        accounts = mDao.getAccountList();
-
+        accounts.addAll(mDao.getAccountList());
+        accountsAll.addAll(mDao.getAccountListWithMerchants());
         // Get fields from view
         mAmountText = (EditText) view.findViewById(R.id.dialog_create_expense_amount);
         mDescriptionText = (EditText) view.findViewById(R.id.dialog_create_expense_description);
@@ -222,7 +222,7 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
 
     private void setOriginalExpenseValues() {
         int index=0;
-        for(Account acc:accounts) {
+        for(Account acc:accountsAll) {
             if(acc.getId()==mOriginalExpense.getGiver())
             mGiver.setSelection(index);
             if(acc.getId() == mOriginalExpense.getTaker())
@@ -505,7 +505,13 @@ public class CreateOrEditTransactionDialogFragment extends AppCompatDialogFragme
         TransactionCategory expenseCategory = expenseCategories.get(mExpenseCategory.getSelectedItemPosition());
         TransactionType expenseType = expenseTypes.get(mExpenseType.getSelectedItemPosition());
         iGiver = accounts.get(mGiver.getSelectedItemPosition()).getId();
-        iTaker = mDao.getAccountOrCreate(mReciver.getText());
+        iTaker = mDao.getAccountOrCreate(mReciver.getText().toString());
+        if(accountsAll.size() != mDao.getAccountListWithMerchants().size()) {
+            try {
+                accounts.add(mDao.getAccount(iTaker));
+            }
+            catch (Exception e){}
+        }
         //If a temp photo was ever taken, copy tempFile to photoFile, then delete tempFile!
         if(tempImagePath != null) {
             File expensesDir = getExpensesDir();

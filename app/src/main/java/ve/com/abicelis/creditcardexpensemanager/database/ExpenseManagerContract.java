@@ -76,7 +76,11 @@ public final class ExpenseManagerContract {
         public static final TableColumn COLUMN_NAME_ACCOUNT_TYPE = new TableColumn(DataType.TEXT, "accounttype");
         public static final TableColumn COLUMN_NAME_BALANCE = new TableColumn(DataType.REAL, "balance");
         public static final TableColumn COLUMN_NAME_BALANCE_UPDATE = new TableColumn(DataType.TEXT, "balanceupdate");
-
+        public static final TableColumn COLUMN_NAME_ACCOUNT_SPARE1 = new TableColumn(DataType.TEXT, "spare1");
+        public static final TableColumn COLUMN_NAME_ACCOUNT_SPARE2 = new TableColumn(DataType.TEXT, "spare2");
+        public static final TableColumn COLUMN_NAME_ACCOUNT_SPARE3 = new TableColumn(DataType.TEXT, "spare3");
+        public static final TableColumn COLUMN_NAME_ACCOUNT_SPARE4 = new TableColumn(DataType.TEXT, "spare4");
+        public static final TableColumn COLUMN_NAME_ACCOUNT_SPARE5 = new TableColumn(DataType.TEXT, "spare5");
         //public static final TableColumn COLUMN_NAME_CLOSING_DAY = new TableColumn(DataType.TEXT, "closingday");
         //public static final TableColumn COLUMN_NAME_DUE_DAY = new TableColumn(DataType.TEXT, "dueday");
         //public static final TableColumn COLUMN_NAME_BACKGROUND = new TableColumn(DataType.TEXT, "background");
@@ -96,6 +100,11 @@ public final class ExpenseManagerContract {
         public static final TableColumn COLUMN_NAME_DATE = new TableColumn(DataType.INTEGER, "date");
         public static final TableColumn COLUMN_NAME_TRANSACTION_CATEGORY = new TableColumn(DataType.TEXT, "transactioncategory");
         public static final TableColumn COLUMN_NAME_TRANSACTION_TYPE = new TableColumn(DataType.TEXT, "transactiontype");
+        public static final TableColumn COLUMN_NAME_TRANSACTION_SPARE1 = new TableColumn(DataType.TEXT, "spare1");
+        public static final TableColumn COLUMN_NAME_TRANSACTION_SPARE2 = new TableColumn(DataType.TEXT, "spare2");
+        public static final TableColumn COLUMN_NAME_TRANSACTION_SPARE3 = new TableColumn(DataType.TEXT, "spare3");
+        public static final TableColumn COLUMN_NAME_TRANSACTION_SPARE4 = new TableColumn(DataType.TEXT, "spare4");
+        public static final TableColumn COLUMN_NAME_TRANSACTION_SPARE5 = new TableColumn(DataType.TEXT, "spare5");
 
     }
 
@@ -105,6 +114,11 @@ public final class ExpenseManagerContract {
         public static final TableColumn COLUMN_NAME_DESCRIPTION = new TableColumn(DataType.TEXT, "description");
         public static final TableColumn COLUMN_NAME_TRASACTION_TYPE = new TableColumn(DataType.TEXT, "transactiontype");
         public static final TableColumn COLUMN_NAME_BUDGET = new TableColumn(DataType.REAL, "budget");
+        public static final TableColumn COLUMN_NAME_TRANSACTION_CATEGORY_SPARE1 = new TableColumn(DataType.TEXT, "spare1");
+        public static final TableColumn COLUMN_NAME_TRANSACTION_CATEGORY_SPARE2 = new TableColumn(DataType.TEXT, "spare2");
+        public static final TableColumn COLUMN_NAME_TRANSACTION_CATEGORY_SPARE3 = new TableColumn(DataType.TEXT, "spare3");
+        public static final TableColumn COLUMN_NAME_TRANSACTION_CATEGORY_SPARE4 = new TableColumn(DataType.TEXT, "spare4");
+        public static final TableColumn COLUMN_NAME_TRANSACTION_CATEGORY_SPARE5 = new TableColumn(DataType.TEXT, "spare5");
     }
 
 

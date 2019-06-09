@@ -103,16 +103,16 @@ public class ChartExpenseFragment extends Fragment {
 
         //Set daily and accumulated values.
         List<DailyExpense> dailyExpenses = dao.getDailyExpenses();
-        List<DailyExpense> accumulatedDailyExpenses = dao.getAccumulatedDailyExpenses();
-        for (int i = 0; i < calendar.getActualMaximum(Calendar.DAY_OF_MONTH); ++i) {
+       // List<DailyExpense> accumulatedDailyExpenses = dao.getAccumulatedDailyExpenses();
+        for (int i = 0; i < dailyExpenses.size(); ++i) {
 
             PointValue aux = new PointValue(i, 1);
             //PointValue aux = new PointValue(i, accumulatedDailyExpenses.get(i).getAmount().floatValue());
-            aux.setTarget(i, accumulatedDailyExpenses.get(i).getAmount().floatValue());
+            aux.setTarget(i, dailyExpenses.get(i).getAccumulated().floatValue());
             accumulatedValues.add(aux);
 
             dailyValues.add(new PointValue(i, dailyExpenses.get(i).getAmount().floatValue()));
-            axisValues.add(new AxisValue(i).setLabel(accumulatedDailyExpenses.get(i).getFormattedDate()));
+            axisValues.add(new AxisValue(i).setLabel(dailyExpenses.get(i).getFormattedDate()));
         }
 
         //Add accumulatedValues line

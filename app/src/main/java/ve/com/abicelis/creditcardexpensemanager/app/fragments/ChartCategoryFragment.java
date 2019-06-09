@@ -87,13 +87,14 @@ public class ChartCategoryFragment extends Fragment {
         //List<BigDecimal> expenseByCategory = creditPeriod.getExpensesByCategory();
         List<SliceValue> sliceValues = new ArrayList<>();
 
-
+        int index=0;
         for (TransactionCategory tc:categories) {
             //SliceValue sliceValue = new SliceValue(expenseByCategory[i].floatValue(), ContextCompat.getColor(getContext(), ExpenseCategory.values()[i].getColor() ));
-            SliceValue sliceValue = new SliceValue(20, ContextCompat.getColor(getContext(), ExpenseCategory.values()[tc.getId()%5].getColor() ));
+            SliceValue sliceValue = new SliceValue(20, ContextCompat.getColor(getContext(), ExpenseCategory.values()[index%5].getColor() ));
             sliceValue.setTarget((float)tc.getSpent());
             sliceValue.setLabel(getExpenseLabel(tc.getSpent(),dao.getBudgetSpendForCurrentMonth(TransactionType.EXPENSE,0),tc.getmName()));
             sliceValues.add(sliceValue);
+            index++;
         }
 
 

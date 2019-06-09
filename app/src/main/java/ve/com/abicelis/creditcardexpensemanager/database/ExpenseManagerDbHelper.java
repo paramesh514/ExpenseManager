@@ -220,10 +220,12 @@ public class ExpenseManagerDbHelper extends SQLiteOpenHelper {
                 ExpenseManagerContract.AccountTable.COLUMN_NAME_CURRENCY.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_CURRENCY.getDataType() + COMMA_SEP +
                 ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_TYPE.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_TYPE.getDataType() + COMMA_SEP +
                 ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE.getDataType() + COMMA_SEP +
-                ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE_UPDATE.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE_UPDATE.getDataType() +
-                //ExpenseManagerContract.AccountTable.COLUMN_NAME_CLOSING_DAY.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_CLOSING_DAY.getDataType() + COMMA_SEP +
-                //ExpenseManagerContract.AccountTable.COLUMN_NAME_DUE_DAY.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_DUE_DAY.getDataType() + COMMA_SEP +
-                //ExpenseManagerContract.CreditCardTable.COLUMN_NAME_BACKGROUND.getName() + " " + ExpenseManagerContract.CreditCardTable.COLUMN_NAME_BACKGROUND.getDataType() +
+                ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE_UPDATE.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_BALANCE_UPDATE.getDataType() +COMMA_SEP +
+                ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_SPARE1.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_SPARE1.getDataType()+COMMA_SEP +
+                ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_SPARE2.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_SPARE2.getDataType()+COMMA_SEP +
+                ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_SPARE3.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_SPARE3.getDataType()+COMMA_SEP +
+                ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_SPARE4.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_SPARE4.getDataType()+COMMA_SEP +
+                ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_SPARE5.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_SPARE5.getDataType()+
                 " ); " ;
         sqLiteDatabase.execSQL(statement);
        //Transaction Table
@@ -238,7 +240,12 @@ public class ExpenseManagerDbHelper extends SQLiteOpenHelper {
                 ExpenseManagerContract.TransactionTable.COLUMN_NAME_CURRENCY.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_CURRENCY.getDataType() + COMMA_SEP +
                 ExpenseManagerContract.TransactionTable.COLUMN_NAME_DATE.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_DATE.getDataType() + COMMA_SEP +
                 ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_CATEGORY.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_CATEGORY.getDataType() + COMMA_SEP +
-                ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_TYPE.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_TYPE.getDataType() +
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_TYPE.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_TYPE.getDataType() +COMMA_SEP +
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_SPARE1.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_SPARE1.getDataType()+COMMA_SEP +
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_SPARE2.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_SPARE2.getDataType()+COMMA_SEP +
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_SPARE3.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_SPARE3.getDataType()+COMMA_SEP +
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_SPARE4.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_SPARE4.getDataType()+COMMA_SEP +
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_SPARE5.getName() + " " + ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_SPARE5.getDataType()+
 
                 " ); ";
         sqLiteDatabase.execSQL(statement);
@@ -247,7 +254,12 @@ public class ExpenseManagerDbHelper extends SQLiteOpenHelper {
                 ExpenseManagerContract.TransactionCategoryTable._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_DESCRIPTION.getName() + " " + ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_DESCRIPTION.getDataType() + COMMA_SEP +
                 ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRASACTION_TYPE.getName() + " " + ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRASACTION_TYPE.getDataType() + COMMA_SEP +
-                ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_BUDGET.getName() + " " + ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_BUDGET.getDataType() +
+                ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_BUDGET.getName() + " " + ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_BUDGET.getDataType() +COMMA_SEP +
+                ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRANSACTION_CATEGORY_SPARE1.getName() + " " + ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRANSACTION_CATEGORY_SPARE1.getDataType() +COMMA_SEP +
+                ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRANSACTION_CATEGORY_SPARE2.getName() + " " + ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRANSACTION_CATEGORY_SPARE2.getDataType() +COMMA_SEP +
+                ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRANSACTION_CATEGORY_SPARE3.getName() + " " + ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRANSACTION_CATEGORY_SPARE3.getDataType() +COMMA_SEP +
+                ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRANSACTION_CATEGORY_SPARE4.getName() + " " + ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRANSACTION_CATEGORY_SPARE4.getDataType() +COMMA_SEP +
+                ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRANSACTION_CATEGORY_SPARE5.getName() + " " + ExpenseManagerContract.TransactionCategoryTable.COLUMN_NAME_TRANSACTION_CATEGORY_SPARE5.getDataType() +
                 //ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_NUMBER.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_NUMBER.getDataType() + COMMA_SEP +
                 //ExpenseManagerContract.AccountTable.COLUMN_NAME_CURRENCY.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_CURRENCY.getDataType() + COMMA_SEP +
                 //ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_TYPE.getName() + " " + ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_TYPE.getDataType() + COMMA_SEP +

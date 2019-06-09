@@ -13,6 +13,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import ve.com.abicelis.creditcardexpensemanager.enums.AccountType;
 import ve.com.abicelis.creditcardexpensemanager.enums.CreditCardBackground;
@@ -74,6 +75,33 @@ public class ExpenseManagerDAO {
      * Note: The Credit Cards will not contain CreditPeriods, Expenses or Payments.
      */
     public List<Account> getAccountList() {
+
+        List<Account> accounts = new ArrayList<>();
+        SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
+String where = ExpenseManagerContract.AccountTable.COLUMN_NAME_ACCOUNT_TYPE.getName() +" <> '"+AccountType.Merchant.getCode()+"'";
+        Cursor cursor = db.query(ExpenseManagerContract.AccountTable.TABLE_NAME, null, where, null, null, null, null);
+
+        try {
+            while (cursor.moveToNext()) {
+                accounts.add(getAccountFromCursor(cursor));
+            }
+        } finally {
+            cursor.close();
+        }
+        for(Account acc:accounts)
+        {
+            double income,expense,transferIn,transferOut,corrections;
+            income = getTotalForAccount(acc.getId(),TransactionType.INCOME);
+            transferIn = getTransferInForAccount(acc.getId());
+            expense = getTotalForAccount(acc.getId(),TransactionType.EXPENSE);
+            transferOut = getTotalForAccount(acc.getId(),TransactionType.TRANSFER);
+            corrections = getTotalForAccount(acc.getId(),TransactionType.CORRECTION);
+            acc.setBalance(income-expense+transferIn-transferOut+corrections);
+        }
+
+        return accounts;
+    }
+    public List<Account> getAccountListWithMerchants() {
 
         List<Account> accounts = new ArrayList<>();
         SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
@@ -172,7 +200,29 @@ public class ExpenseManagerDAO {
 
         return totalAmount;
     }
+    private List<Transaction> getTransactionInPeroid(Calendar start, Calendar end) {
+        List<Transaction> accounts = new ArrayList<>();
+        SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
+        long startDateInMs = start.getTimeInMillis();
+        long endDateInMs = end.getTimeInMillis();
 
+        String where = ExpenseManagerContract.TransactionTable.COLUMN_NAME_DATE.getName()+" < "+endDateInMs+" AND "+
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_DATE.getName()+" > "+startDateInMs;
+
+        Cursor cursor = db.query(ExpenseManagerContract.TransactionTable.TABLE_NAME, null, where, null, null, null,
+                null);
+
+        try {
+            while (cursor.moveToNext()) {
+                accounts.add(getTransactionFromCursor(cursor));
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return accounts;
+
+    }
     public List<Transaction> getTransactionList() {
 
         List<Transaction> accounts = new ArrayList<>();
@@ -212,9 +262,32 @@ public class ExpenseManagerDAO {
     }
     public double getBudgetSpendForCurrentMonth(TransactionType ty, int tid) {
 
+        Calendar start = Calendar.getInstance();
+        start.set(Calendar.DATE,1);
+        start.set(Calendar.HOUR_OF_DAY, 0);
+        start.set(Calendar.MINUTE, 0);
+        start.set(Calendar.SECOND, 0);
+        start.set(Calendar.MILLISECOND, 0);
+
+        Calendar end = Calendar.getInstance();
+
+        return getBudgetSpendForMonth(ty,tid,start,end);
+
+    }
+        public double getBudgetSpendForMonth(TransactionType ty, int tid,Calendar start,Calendar end) {
+
         double totalAmount=0.0;
+        long startDateInMs = start.getTimeInMillis();
+        long endDateInMs = end.getTimeInMillis();
+
+        String whereTime = ExpenseManagerContract.TransactionTable.COLUMN_NAME_DATE.getName()+" < "+endDateInMs+" AND "+
+                ExpenseManagerContract.TransactionTable.COLUMN_NAME_DATE.getName()+" > "+startDateInMs;
+
+
         String whereClause = ExpenseManagerContract.TransactionTable.COLUMN_NAME_TRANSACTION_TYPE.getName() +
                 " = '" + ty.getCode() + "' ";
+        whereClause+=" AND "+whereTime;
+
         String[] tableColumns = new String[] {
                 "sum("+ ExpenseManagerContract.TransactionTable.COLUMN_NAME_AMOUNT.getName() +") As total"
         };
@@ -265,9 +338,28 @@ public class ExpenseManagerDAO {
         } finally {
             cursor.close();
         }
+        double totalBudget=0.0;
+        double budgetAll=0.0;
         for(TransactionCategory tc:transactionCategories)
         {
+            if(tc.getId() != 0)
+            {
+                totalBudget+=tc.getBudget();
+            }
+            else
+                budgetAll =tc.getBudget();
+
             tc.setSpent(getBudgetSpendForCurrentMonth(tc.getType(),tc.getId()));
+        }
+        if(budgetAll == 0.0) {
+            for (TransactionCategory tc : transactionCategories) {
+                if (tc.getId() == 0) {
+                    if(totalBudget > 0.0)
+                        tc.setBudget(totalBudget);
+                    else
+                        tc.setBudget(tc.getSpent());
+                }
+            }
         }
         return transactionCategories;
     }
@@ -288,6 +380,7 @@ public class ExpenseManagerDAO {
         } finally {
             cursor.close();
         }
+
         for(TransactionCategory tc:transactionCategories)
         {
             tc.setSpent(getBudgetSpendForCurrentMonth(tc.getType(),tc.getId()));
@@ -389,6 +482,10 @@ public class ExpenseManagerDAO {
         TransactionCategory tc = getTransactionCategoryFromCursor(cursor);
         cursor.close();
         tc.setSpent(getBudgetSpendForCurrentMonth(tc.getType(),tc.getId()));
+        if(tc.getBudget()==0&&tc.getId()==0)
+        {
+            tc.setBudget(tc.getSpent());
+        }
         return  tc;
     }
 
@@ -899,7 +996,7 @@ public class ExpenseManagerDAO {
 
         long newRowId;
         newRowId = db.insert(ExpenseManagerContract.AccountTable.TABLE_NAME, null, values);
-        if(newRowId != -1)
+        if(newRowId != -1 && account.getBalance()!=0)
         {
             insertTransaction(new Transaction((int)newRowId,(int)newRowId,"initial Balance",null,null,
                     new BigDecimal(account.getBalance()),
@@ -1232,23 +1329,131 @@ public class ExpenseManagerDAO {
 
     public List<DailyExpense> getDailyExpenses() {
         List<DailyExpense> del = new ArrayList<>();
-        for(int i=0;i<31;i++)
+        BigDecimal accumulated = new BigDecimal(0);
+        BigDecimal total;
+        Calendar start = Calendar.getInstance();
+        start.set(Calendar.DATE,1);
+        start.set(Calendar.HOUR_OF_DAY, 0);
+        start.set(Calendar.MINUTE, 0);
+        start.set(Calendar.SECOND, 0);
+        start.set(Calendar.MILLISECOND, 0);
+
+        Calendar end = Calendar.getInstance();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeZone(start.getTimeZone());
+        cal.setTimeInMillis(start.getTimeInMillis());
+
+        List<Transaction> trans = getTransactionInPeroid( start, end);
+        int totalDays = getTotalDaysInPeriod(start,end);
+        totalDays+=1;
+        for (int i = 0; i < totalDays; i++) {
+            del.add(i, new DailyExpense(cal, new BigDecimal(0),new BigDecimal(0)));
+
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+        }
+
+        for(Transaction tran:trans)
         {
-            del.add(new DailyExpense(Calendar.getInstance(),new BigDecimal(100)));
+            int dayIndex = getDateIndex(start,tran.getDate());
+            del.get(dayIndex).addToAmount(tran.getAmount());
+        }
+
+        for(int i=0;i<totalDays;i++) {
+            total = del.get(i).getAmount();
+            accumulated = accumulated.add(total);
+            del.get(i).setAccumulated(accumulated);
         }
         return del;
     }
+    public int getTotalDaysInPeriod(Calendar startDate,Calendar endDate) {
 
-    public List<DailyExpense> getAccumulatedDailyExpenses() {
-        List<DailyExpense> del = new ArrayList<>();
-        for(int i=0;i<31;i++)
-        {
-            del.add(new DailyExpense(Calendar.getInstance(),new BigDecimal(100)));
-        }
-        return del;
+        // Create copies so we don't update the original calendars.
+        Calendar start = Calendar.getInstance();
+        start.setTimeZone(startDate.getTimeZone());
+        start.setTimeInMillis(startDate.getTimeInMillis());
+
+        Calendar end = Calendar.getInstance();
+        end.setTimeZone(endDate.getTimeZone());
+        end.setTimeInMillis(endDate.getTimeInMillis());
+
+        // Add one millisecond so that the subtraction below works.
+        // If end = Aug 5 23:59:59 we add one millisecond
+        // so end = Aug 6 00:00:00 so that Aug 5 counts
+        end.add(Calendar.MILLISECOND, 1);
+
+
+        // At this point, each calendar is set to midnight on
+        // their respective days. Now use TimeUnit.MILLISECONDS to
+        // compute the number of full days between the two of them.
+        int days = (int)TimeUnit.MILLISECONDS.toDays(Math.abs(end.getTimeInMillis() - start.getTimeInMillis()));
+        return days;
     }
 
-    public int getAccountOrCreate(Editable text) {
-        return Account.CASH_ID;
+    public int getDateIndex(Calendar startDate,Calendar dateToBeIndexed) {
+
+        // Create copies so we don't update the original calendars.
+        Calendar start = Calendar.getInstance();
+        start.setTimeZone(startDate.getTimeZone());
+        start.setTimeInMillis(startDate.getTimeInMillis());
+
+        Calendar end = Calendar.getInstance();
+        end.setTimeZone(dateToBeIndexed.getTimeZone());
+        end.setTimeInMillis(dateToBeIndexed.getTimeInMillis());
+
+        // Set the copies to be at midnight, but keep the day information.
+        start.set(Calendar.HOUR_OF_DAY, 0);
+        start.set(Calendar.MINUTE, 0);
+        start.set(Calendar.SECOND, 0);
+        start.set(Calendar.MILLISECOND, 0);
+        end.set(Calendar.HOUR_OF_DAY, 0);
+        end.set(Calendar.MINUTE, 0);
+        end.set(Calendar.SECOND, 0);
+        end.set(Calendar.MILLISECOND, 0);
+
+        // At this point, each calendar is set to midnight on
+        // their respective days. Now use TimeUnit.MILLISECONDS to
+        // compute the number of full days between the two of them.
+
+
+        int days = (int) TimeUnit.MILLISECONDS.toDays(Math.abs(end.getTimeInMillis() - start.getTimeInMillis()));
+        return days;
+    }
+
+
+
+
+    public int getAccountOrCreate(String accName) {
+        int accId=-1;
+
+        SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
+String where = ExpenseManagerContract.AccountTable.COLUMN_NAME_NICK_NAME.getName()+"='"+accName+"'";
+where+= " OR "+ExpenseManagerContract.AccountTable.COLUMN_NAME_BANK_NAME.getName()+"='"+accName+"'";
+        Cursor cursor = db.query(ExpenseManagerContract.AccountTable.TABLE_NAME, null, where, null, null, null, null);
+
+        try {
+            while (cursor.moveToNext()) {
+                       accId = new Integer(cursor.getString(cursor.getColumnIndex(ExpenseManagerContract.AccountTable._ID)));
+            }
+        }catch (Exception e)
+        {
+
+        }
+        finally {
+            cursor.close();
+        }
+
+        if(accId == -1)
+        {
+            try {
+                accId = (int)insertAccount(new Account(accName, accName, "1", 0, Currency.INR, AccountType.Merchant, Calendar.getInstance()));
+            }
+            catch (Exception ex)
+            {
+                accId =Account.CASH_ID;
+            }
+        }
+
+        return accId;
     }
 }
